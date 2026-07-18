@@ -4,6 +4,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDVQSpqANkJSwdv-zZo-W9jKzWUcItJrtc",
   authDomain: "broto-quiz-4157c.firebaseapp.com",
   projectId: "broto-quiz-4157c",
+  databaseURL: "https://broto-quiz-4157c-default-rtdb.firebaseio.com",
   storageBucket: "broto-quiz-4157c.firebasestorage.app",
   messagingSenderId: "971377890411",
   appId: "1:971377890411:web:b3c1d9f89e2beffec80d2e"
