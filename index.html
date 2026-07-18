@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=3.5">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -31,7 +31,7 @@
   <!-- HOST: creating -->
   <div class="screen" id="screen-host-setup">
     <div class="eyebrow">Apresentador</div>
-    <h2 style="font-size:28px;text-align:center;">Abrindo sua sala…</h2>
+    <h2 style="font-size:26px;text-align:center;">Abrindo sua sala…</h2>
     <p class="subtitle">Conectando ao jardim digital</p>
     <div class="loading-dots"><span></span><span></span><span></span></div>
   </div>
@@ -39,7 +39,7 @@
   <!-- HOST: lobby -->
   <div class="screen" id="screen-host-lobby">
     <div class="eyebrow">Projete esta tela</div>
-    <h2 style="font-size:22px;">Entrem pelo celular em</h2>
+    <h2 style="font-size:20px;">Entrem pelo celular em</h2>
     <div class="code-plate" id="host-code">------</div>
     <div class="qr-wrap"><div id="qr-box"></div></div>
     <div class="lobby-grid" id="host-players"></div>
@@ -72,37 +72,37 @@
   <!-- HOST: final podium -->
   <div class="screen" id="screen-host-podium">
     <div class="eyebrow">Resultado final</div>
-    <h1 style="font-size:clamp(32px,7vw,56px);text-align:center;margin-bottom:8px;">O jardim floresceu 🌸</h1>
-    <p class="subtitle" style="margin-top:0; margin-bottom:20px;">Revelando do último ao primeiro lugar…</p>
+    <h1 style="font-size:clamp(28px,6vw,48px);text-align:center;margin-bottom:6px;">O jardim floresceu 🌸</h1>
+    <p class="subtitle" style="margin-top:0; margin-bottom:18px;">Revelando do último ao primeiro lugar…</p>
     <div class="podium-stage" id="host-podium"></div>
     <div class="rank-list" id="host-ranklist"></div>
-    <button class="btn btn-ghost" onclick="location.reload()" style="margin-top:26px;">Encerrar e voltar ao início</button>
+    <button class="btn btn-ghost" onclick="location.reload()" style="margin-top:22px;">Encerrar e voltar ao início</button>
   </div>
 
   <!-- JOIN: code entry -->
   <div class="screen" id="screen-join-code">
     <div class="eyebrow">Entrar na sala</div>
-    <h2 style="font-size:26px;">Digite o código do quiz</h2>
-    <div class="card" style="max-width:380px; margin-top:24px;">
+    <h2 style="font-size:24px;">Digite o código do quiz</h2>
+    <div class="card" style="max-width:360px; margin-top:20px;">
       <input type="text" id="join-code-input" maxlength="6" placeholder="000000" inputmode="numeric">
       <div class="error-text" id="join-code-error"></div>
-      <button class="btn btn-primary" style="width:100%; margin-top:16px;" onclick="submitCode()">Continuar →</button>
+      <button class="btn btn-primary" style="width:100%; margin-top:14px;" onclick="submitCode()">Continuar →</button>
     </div>
-    <button class="btn btn-ghost" onclick="goLanding()" style="margin-top:18px;">← voltar</button>
+    <button class="btn btn-ghost" onclick="goLanding()" style="margin-top:16px;">← voltar</button>
   </div>
 
   <!-- JOIN: profile -->
   <div class="screen" id="screen-join-profile">
     <div class="eyebrow">Sua identidade na sala</div>
-    <h2 style="font-size:24px;">Como querem te chamar?</h2>
-    <div class="card" style="max-width:460px; margin-top:20px;">
+    <h2 style="font-size:22px;">Como querem te chamar?</h2>
+    <div class="card" style="max-width:440px; margin-top:18px;">
       <input type="text" class="name-input" id="join-name-input" maxlength="18" placeholder="Seu nome ou apelido" oninput="checkNameFilter()">
       <div class="filter-warning" id="name-filter-warning">
         <span>⚠️</span> Esse nome contém termos impróprios. Escolha outro, por favor.
       </div>
-      <div style="margin-top:16px; margin-bottom:4px; font-size:13px; color:var(--cream-dim); font-weight:500;">Escolha seu personagem:</div>
+      <div style="margin-top:14px; margin-bottom:2px; font-size:12px; color:var(--cream-dim); font-weight:500;">Escolha seu personagem:</div>
       <div class="avatar-grid" id="avatar-grid"></div>
-      <button class="btn btn-primary" style="width:100%; margin-top:8px;" onclick="playerJoinRoom()" id="btn-join-room">Entrar na sala 🌱</button>
+      <button class="btn btn-primary" style="width:100%; margin-top:6px;" onclick="playerJoinRoom()" id="btn-join-room">Entrar na sala 🌱</button>
       <div class="error-text" id="join-profile-error"></div>
     </div>
   </div>
@@ -114,7 +114,7 @@
       <img src="" alt="" class="wait-av" id="player-wait-av-img">
       <div class="wait-name" id="player-wait-name">—</div>
       <div class="wait-hint">Aguarde a pessoa apresentadora iniciar o quiz na tela projetada.</div>
-      <div class="code-tag" style="margin-top:16px; display:inline-block;" id="player-wait-code">sala ------</div>
+      <div class="code-tag" style="margin-top:14px; display:inline-block;" id="player-wait-code">sala ------</div>
     </div>
   </div>
 
@@ -125,7 +125,7 @@
       <span class="q-counter" id="player-timer">20s</span>
     </div>
     <div class="timer-wrap"><div class="timer-bar" id="player-timerbar"></div></div>
-    <p class="subtitle" style="margin-top:0; font-size:clamp(16px,2.5vw,20px);" id="player-qtext">—</p>
+    <p class="subtitle" style="margin-top:0; font-size:clamp(15px,2.4vw,19px);" id="player-qtext">—</p>
     <div class="opts-grid" id="player-opts"></div>
     <div class="error-text" id="player-answer-status"></div>
   </div>
@@ -140,9 +140,9 @@
   <!-- PLAYER: podium -->
   <div class="screen" id="screen-player-podium">
     <div class="eyebrow">Fim de jogo</div>
-    <div style="font-size:56px; margin:12px 0; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));" id="player-final-emoji">🌼</div>
-    <h1 style="font-size:clamp(28px,7vw,44px); text-align:center;" id="player-final-rank">—</h1>
-    <div class="score-badge" id="player-final-score" style="font-size:22px; margin:8px 0 20px;"></div>
+    <div style="font-size:48px; margin:10px 0; filter:drop-shadow(0 3px 10px rgba(0,0,0,0.25));" id="player-final-emoji">🌼</div>
+    <h1 style="font-size:clamp(26px,6vw,40px); text-align:center;" id="player-final-rank">—</h1>
+    <div class="score-badge" id="player-final-score" style="font-size:20px; margin:6px 0 18px;"></div>
     <div class="rank-list" id="player-final-list"></div>
   </div>
 
@@ -151,6 +151,6 @@
 <div class="demo-badge" id="demo-badge" onclick="toggleDemoMode()" style="display:none;">🧪 Modo Demo</div>
 
 <script src="questions.js"></script>
-<script src="app.js"></script>
+<script src="app.js?v=3.5"></script>
 </body>
 </html>
