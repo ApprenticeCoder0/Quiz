@@ -1,7 +1,6 @@
 /* ============================================================
-   BROTO v4.0 - Quiz Coletivo: Etica Ambiental & Ecofeminismo
-   Respostas Aleatorizadas - Avatares Fotos - Filtro Global
-   Sistema de Streak - Gap ao Vivo - Podio Premium - Mobile-First
+   BROTO v5.0 — Quiz Coletivo: Ética Ambiental & Ecofeminismo
+   Design Premium · Avatares Artísticos · Animações Fluidas
    ============================================================ */
 
 /* ============== FIREBASE CONFIG ============== */
@@ -15,90 +14,161 @@ const firebaseConfig = {
   appId: "1:379059171454:web:8574b77f5ec7eec8dbe82f"
 };
 
-/* ============== AVATARES - Gerados Dinamicamente ============== */
-const AVATAR_PALETTES = [
-  {name:"Chico Mendes", initials:"CM", bg:"#2d5a3d", bg2:"#4a8c5c", icon:"🌳"},
-  {name:"Vandana Shiva", initials:"VS", bg:"#5a3d2d", bg2:"#8c6a4a", icon:"🌾"},
-  {name:"Greta Thunberg", initials:"GT", bg:"#2d3d5a", bg2:"#4a6a8c", icon:"🌍"},
-  {name:"Marina Silva", initials:"MS", bg:"#3d5a2d", bg2:"#6a8c4a", icon:"🌿"},
-  {name:"David Attenborough", initials:"DA", bg:"#3d2d5a", bg2:"#6a4a8c", icon:"🦎"},
-  {name:"Wangari Maathai", initials:"WM", bg:"#5a5a2d", bg2:"#8c8c4a", icon:"🌳"},
-  {name:"Jane Goodall", initials:"JG", bg:"#2d5a5a", bg2:"#4a8c8c", icon:"🐒"},
-  {name:"Leonardo DiCaprio", initials:"LD", bg:"#1a3a2a", bg2:"#3a6a4a", icon:"🎬"},
-  {name:"Rachel Carson", initials:"RC", bg:"#3a1a2a", bg2:"#6a3a4a", icon:"📖"},
-  {name:"Francoise d'Eaubonne", initials:"FE", bg:"#2a3a1a", bg2:"#4a6a3a", icon:"♀️"},
-  {name:"Donna Haraway", initials:"DH", bg:"#1a2a3a", bg2:"#3a4a6a", icon:"🐕"},
-  {name:"Val Plumwood", initials:"VP", bg:"#3a2a1a", bg2:"#6a4a3a", icon:"🌲"},
-  {name:"Carolyn Merchant", initials:"CM2", bg:"#2a1a3a", bg2:"#4a3a6a", icon:"📚"},
-  {name:"Severn Cullis-Suzuki", initials:"SS", bg:"#1a3a3a", bg2:"#3a6a6a", icon:"🎤"},
-  {name:"Xiuhtezcatl Martinez", initials:"XM", bg:"#3a3a1a", bg2:"#6a6a3a", icon:"🌵"}
+/* ============== AVATARES ARTÍSTICOS SVG ==============
+   Cada avatar tem um SVG único gerado com gradientes,
+   padrões geométricos e iniciais elegantes.
+   As fotos da Wikimedia são mantidas como tentativa,
+   mas o SVG garante que nunca haverá imagem quebrada.
+   ==================================================== */
+const AVATAR_DATA = [
+  {name:"Chico Mendes", initials:"CM", icon:"🌳",
+   grad:["#2d5a3d","#5a9e6e"], pattern:"circles",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Chico_Mendes.jpg/220px-Chico_Mendes.jpg"},
+  {name:"Vandana Shiva", initials:"VS", icon:"🌾",
+   grad:["#5a3d2d","#9e7a5a"], pattern:"dots",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Vandana_Shiva.jpg/220px-Vandana_Shiva.jpg"},
+  {name:"Greta Thunberg", initials:"GT", icon:"🌍",
+   grad:["#2d3d5a","#5a7a9e"], pattern:"lines",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Greta_Thunberg_01.jpg/220px-Greta_Thunberg_01.jpg"},
+  {name:"Marina Silva", initials:"MS", icon:"🌿",
+   grad:["#3d5a2d","#6e9e5a"], pattern:"circles",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Marina_Silva.jpg/220px-Marina_Silva.jpg"},
+  {name:"David Attenborough", initials:"DA", icon:"🦎",
+   grad:["#3d2d5a","#7a5a9e"], pattern:"dots",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/David_Attenborough.jpg/220px-David_Attenborough.jpg"},
+  {name:"Wangari Maathai", initials:"WM", icon:"🌳",
+   grad:["#5a5a2d","#9e9e5a"], pattern:"lines",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Wangari_Maathai.jpg/220px-Wangari_Maathai.jpg"},
+  {name:"Jane Goodall", initials:"JG", icon:"🐒",
+   grad:["#2d5a5a","#5a9e9e"], pattern:"circles",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Jane_Goodall.jpg/220px-Jane_Goodall.jpg"},
+  {name:"Leonardo DiCaprio", initials:"LD", icon:"🎬",
+   grad:["#1a3a2a","#4a7a5a"], pattern:"dots",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Leonardo_Dicaprio_Cannes_2019.jpg/220px-Leonardo_Dicaprio_Cannes_2019.jpg"},
+  {name:"Rachel Carson", initials:"RC", icon:"📖",
+   grad:["#3a1a2a","#7a4a5a"], pattern:"lines",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Rachel-Carson.jpg/220px-Rachel-Carson.jpg"},
+  {name:"Françoise d'Eaubonne", initials:"FE", icon:"♀️",
+   grad:["#2a3a1a","#5a7a4a"], pattern:"circles",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Fran%C3%A7oise_d%27Eaubonne.jpg/220px-Fran%C3%A7oise_d%27Eaubonne.jpg"},
+  {name:"Donna Haraway", initials:"DH", icon:"🐕",
+   grad:["#1a2a3a","#4a5a7a"], pattern:"dots",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Donna_Haraway.jpg/220px-Donna_Haraway.jpg"},
+  {name:"Val Plumwood", initials:"VP", icon:"🌲",
+   grad:["#3a2a1a","#7a5a4a"], pattern:"lines",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Val_Plumwood.jpg/220px-Val_Plumwood.jpg"},
+  {name:"Carolyn Merchant", initials:"CM2", icon:"📚",
+   grad:["#2a1a3a","#5a4a7a"], pattern:"circles",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Carolyn_Merchant.jpg/220px-Carolyn_Merchant.jpg"},
+  {name:"Severn Cullis-Suzuki", initials:"SS", icon:"🎤",
+   grad:["#1a3a3a","#4a7a7a"], pattern:"dots",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Severn_Cullis-Suzuki.jpg/220px-Severn_Cullis-Suzuki.jpg"},
+  {name:"Xiuhtezcatl Martinez", initials:"XM", icon:"🌵",
+   grad:["#3a3a1a","#7a7a4a"], pattern:"lines",
+   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Xiuhtezcatl_Martinez.jpg/220px-Xiuhtezcatl_Martinez.jpg"}
 ];
 
-function generateAvatarSVG(palette, size) {
+function generateArtisticAvatar(data, size) {
   size = size || 120;
-  return 'data:image/svg+xml;utf8,' + encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 100 100">' +
-    '<defs>' +
-    '<linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">' +
-    '<stop offset="0%" style="stop-color:' + palette.bg + '"/>' +
-    '<stop offset="100%" style="stop-color:' + palette.bg2 + '"/>' +
-    '</linearGradient>' +
-    '<filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="rgba(0,0,0,0.3)"/></filter>' +
-    '</defs>' +
-    '<circle cx="50" cy="50" r="48" fill="url(#g)" stroke="rgba(242,234,212,0.2)" stroke-width="1.5"/>' +
-    '<circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>' +
-    '<text x="50" y="46" text-anchor="middle" font-family="Georgia,serif" font-size="22" font-weight="700" fill="#f2ead4" filter="url(#s)">' + palette.initials + '</text>' +
-    '<text x="50" y="68" text-anchor="middle" font-size="14">' + palette.icon + '</text>' +
-    '</svg>'
-  );
+  const s = size;
+  const id = 'av-' + Math.random().toString(36).slice(2, 8);
+
+  // Pattern definitions
+  let patternSVG = '';
+  if (data.pattern === 'circles') {
+    patternSVG = '<circle cx="25" cy="25" r="15" fill="rgba(255,255,255,0.04)"/>' +
+                 '<circle cx="75" cy="75" r="20" fill="rgba(255,255,255,0.03)"/>' +
+                 '<circle cx="75" cy="25" r="10" fill="rgba(255,255,255,0.05)"/>' +
+                 '<circle cx="25" cy="75" r="12" fill="rgba(255,255,255,0.04)"/>';
+  } else if (data.pattern === 'dots') {
+    for (let r = 0; r < 5; r++) {
+      for (let c = 0; c < 5; c++) {
+        patternSVG += `<circle cx="${10 + c*20}" cy="${10 + r*20}" r="2" fill="rgba(255,255,255,0.06)"/>`;
+      }
+    }
+  } else {
+    patternSVG = '<line x1="0" y1="30" x2="100" y2="30" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>' +
+                 '<line x1="0" y1="50" x2="100" y2="50" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>' +
+                 '<line x1="0" y1="70" x2="100" y2="70" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>' +
+                 '<line x1="30" y1="0" x2="30" y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>' +
+                 '<line x1="70" y1="0" x2="70" y2="100" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>';
+  }
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 100 100">
+    <defs>
+      <linearGradient id="${id}-g" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:${data.grad[0]}"/>
+        <stop offset="100%" style="stop-color:${data.grad[1]}"/>
+      </linearGradient>
+      <filter id="${id}-s">
+        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.35)"/>
+      </filter>
+      <filter id="${id}-glow">
+        <feGaussianBlur stdDeviation="2" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <circle cx="50" cy="50" r="48" fill="url(#${id}-g)" stroke="rgba(240,234,214,0.15)" stroke-width="1.5"/>
+    <g opacity="0.6">${patternSVG}</g>
+    <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <text x="50" y="48" text-anchor="middle" font-family="Georgia,serif" font-size="24" font-weight="700" fill="#f2ead4" filter="url(#${id}-s)">${data.initials}</text>
+    <text x="50" y="72" text-anchor="middle" font-size="16" filter="url(#${id}-glow)">${data.icon}</text>
+  </svg>`;
+
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
 }
 
 function getAvatarUrl(index, size) {
-  var p = AVATAR_PALETTES[index % AVATAR_PALETTES.length];
-  return generateAvatarSVG(p, size || 120);
+  const data = AVATAR_DATA[index % AVATAR_DATA.length];
+  // Always return the artistic SVG as primary - photos are bonus
+  return generateArtisticAvatar(data, size);
 }
 
-const AVATARS = AVATAR_PALETTES.map(function(p, i) {
-  return {name: p.name, url: getAvatarUrl(i, 120), palette: p};
-});
+// For photo attempts (with automatic fallback)
+function getPhotoUrl(index) {
+  const data = AVATAR_DATA[index % AVATAR_DATA.length];
+  return data.photo || null;
+}
 
-/* ============== FILTRO DE NOMES - ABRENGENTE ============== */
+const AVATARS = AVATAR_DATA.map((data, i) => ({
+  name: data.name,
+  url: getAvatarUrl(i, 120),
+  photo: getPhotoUrl(i),
+  palette: data
+}));
+
+/* ============== FILTRO DE NOMES ============== */
 const BAD_WORDS_PT = [
   "buceta","caralho","cu","foda","foder","foda-se","fodase","fodido","fudido",
   "merda","porra","puta","puto","pica","pinto","bosta","viado","bicha","bichona",
-  "baitola","boiola","cuzao","cuzao","filho da puta","fdp","arrombado","arrombada",
+  "baitola","boiola","cuzao","filho da puta","fdp","arrombado","arrombada",
   "vagabundo","vagabunda","idiota","imbecil","retardado","retardada","mongol",
   "mongoloide","negro","neguin","macaco","crioulo","hitler","nazi","nazista",
-  "estuprador","estupro","pedofilo","pedofilo","gayzinho","viadinho",
-  "bichinha","sapatao","sapatao","traveco","vadia","escroto","escrota",
-  "nojento","nojenta","coco","coco","mijar","mijo","urina","urinar","defecar",
-  "seu cu","fode","fodendo","fodido","fodida","putaria","porno","porno",
-  "pornografia","sexo","transar","transou","transando","boquete","anal",
-  "penis","penis","vagina","clitoris","clitoris","masturbar","masturbacao",
-  "gozar","gozada","esperma","semen","orgasmo","ereto","erecao","tesao","tesao",
-  "pau","rola","piroca","pika","bilau","bilola","bucetinha","xoxota","xota",
-  "xoxotinha","pepeca","pepeka","priquito","prikito","bct","ct","vsf",
-  "vai se foder","vai tomar no cu","vtnc","vtmnc","tomar no cu","tnc","tmnc",
-  "se foder","se fodendo","fodasse","foda se","fodase","fdps","filhodaputa",
-  "filho daputa","filho da puta","f d p","f.d.p","cuzinho","cu de","cu do",
-  "cu da","arrombados","arrombadas","merdinha","merdao","merdao","bostinha",
-  "bostao","bostao","nojentos","nojentas","idiotas","imbecis","retardados",
-  "retardadas","mongol","mongoloide","mongoloide","down","sindrome","sindrome",
-  "autista","autismo","esquizofrenico","esquizofrenico","louco","louca","doido",
-  "doida","maluco","maluca","psicopata","psicotico","psicotico","maníaco",
-  "maniaco","depressivo","depressiva","suicida","suicidio","suicidio","morte",
-  "morto","morta","matar","matou","matando","assassino","assassina",
-  "assassinato","crime","criminoso","criminosa","ladrao","ladrao","ladra",
-  "roubou","roubando","furto","furou","estelionato","golpe","golpista",
-  "corrupto","corrupta","corrupcao","propina","suborno","trafico","trafico",
-  "droga","drogas","maconha","cocaina","cocaina","crack","heroina","heroina",
-  "lsd","ecstasy","metanfetamina","anfetamina","mdma","thc","baseado","beck",
-  "bong","pipe","drogado","drogada","viciado","viciada","dependente","quimico",
-  "quimico","alcoolatra","alcoolismo","bebado","bebado","bebada","bebada",
-  "bebedo","bebedo","cachaca","cachaca","pinga","aguardente","whisky","vodka",
-  "cerveja","chopp","vinho","alcool","alcool","prostituta","prostituto",
-  "prostitutas","prostitutos","garota de programa","gp","miche","miche",
-  "cafetao","cafetao","cafetina"
+  "estuprador","estupro","pedofilo","gayzinho","viadinho","bichinha","sapatao",
+  "traveco","vadia","escroto","escrota","nojento","nojenta","coco","mijar","mijo",
+  "urina","urinar","defecar","seu cu","fode","fodendo","fodida","putaria","porno",
+  "pornografia","sexo","transar","transou","transando","boquete","anal","penis",
+  "vagina","clitoris","masturbar","masturbacao","gozar","gozada","esperma","semen",
+  "orgasmo","ereto","erecao","tesao","pau","rola","piroca","pika","bilau","bilola",
+  "bucetinha","xoxota","xota","xoxotinha","pepeca","pepeka","priquito","prikito",
+  "bct","ct","vsf","vai se foder","vai tomar no cu","vtnc","vtmnc","tomar no cu",
+  "tnc","tmnc","se foder","se fodendo","fodasse","foda se","fdps","filhodaputa",
+  "filho daputa","filho da puta","f d p","f.d.p","cuzinho","cu de","cu do","cu da",
+  "arrombados","arrombadas","merdinha","merdao","bostinha","bostao","nojentos",
+  "nojentas","idiotas","imbecis","retardados","retardadas","mongoloide","down",
+  "sindrome","autista","autismo","esquizofrenico","louco","louca","doido","doida",
+  "maluco","maluca","psicopata","psicotico","maníaco","maniaco","depressivo",
+  "depressiva","suicida","suicidio","morte","morto","morta","matar","matou",
+  "matando","assassino","assassina","assassinato","crime","criminoso","criminosa",
+  "ladrao","ladra","roubou","roubando","furto","furou","estelionato","golpe",
+  "golpista","corrupto","corrupta","corrupcao","propina","suborno","trafico",
+  "droga","drogas","maconha","cocaina","crack","heroina","lsd","ecstasy",
+  "metanfetamina","anfetamina","mdma","thc","baseado","beck","bong","pipe",
+  "drogado","drogada","viciado","viciada","dependente","quimico","alcoolatra",
+  "alcoolismo","bebado","bebada","bebedo","cachaca","pinga","aguardente",
+  "whisky","vodka","cerveja","chopp","vinho","alcool","prostituta","prostituto",
+  "prostitutas","prostitutos","garota de programa","gp","miche","cafetao",
+  "cafetina"
 ];
 
 const BAD_WORDS_EN = [
@@ -113,7 +183,7 @@ const BAD_WORDS_EN = [
   "bomb","shooting","shooter","gun","weapon","explosive","acid","poison",
   "torture","abuse","abuser","bully","harass","stalk","threat","threaten",
   "violence","violent","attack","assault","fight","beaten","stab","strangle",
-  "drown","hang","burn","acid","knife","blade","razor","overdose","pills"
+  "drown","hang","burn","knife","blade","razor","overdose","pills"
 ];
 
 const BAD_WORDS_ES = [
@@ -122,8 +192,8 @@ const BAD_WORDS_ES = [
   "naco","prieto","negro","negrata","marica","bollera","tortillera","zorra",
   "perra","perro","malparido","hijueputa","hijo de puta","gonorrea","cuca",
   "chucha","teta","tetas","picha","polla","cojones","huevos","mamada","mamon",
-  "pajero","coger","cogiendo","cogido","follar","follando","follando","sexo",
-  "sexual","desnudo","desnuda","pornografia","porno","xxx","prostituta","puticlub"
+  "pajero","coger","cogiendo","cogido","follar","follando","sexo","sexual",
+  "desnudo","desnuda","pornografia","porno","xxx","prostituta","puticlub"
 ];
 
 const BAD_WORDS_FR = [
@@ -133,11 +203,11 @@ const BAD_WORDS_FR = [
   "hitlerien","pute","putain","salopard","ordure","trou du cul","trouduc"
 ];
 
-const BAD_WORDS_ALL = BAD_WORDS_PT.concat(BAD_WORDS_EN, BAD_WORDS_ES, BAD_WORDS_FR);
+const BAD_WORDS_ALL = [...BAD_WORDS_PT, ...BAD_WORDS_EN, ...BAD_WORDS_ES, ...BAD_WORDS_FR];
 
 function normalizeLeet(text) {
-  var result = text.toLowerCase();
-  var replacements = [
+  let result = text.toLowerCase();
+  const replacements = [
     ['4','a'],['@','a'],['^','a'],['ª','a'],
     ['8','b'],['6','b'],
     ['<','c'],['{','c'],['[','c'],['©','c'],
@@ -147,52 +217,44 @@ function normalizeLeet(text) {
     ['1','i'],['!','i'],['|','i'],[':','i'],[';','i'],
     ['7','t'],['+','t'],['†','t'],
     ['5','s'],['$','s'],['z','s'],['§','s'],
-    ['2','z'],['%','z'],
-    ['v','v'],
-    ['u','v']
+    ['2','z'],['%','z']
   ];
-  for (var r = 0; r < replacements.length; r++) {
-    var from = replacements[r][0];
-    var to = replacements[r][1];
-    var regex = new RegExp(from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+  replacements.forEach(([from, to]) => {
+    const regex = new RegExp(from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
     result = result.replace(regex, to);
-  }
+  });
   return result;
 }
 
-function containsBadWord(name){
-  var lower = name.toLowerCase().trim();
-  var normalized = normalizeLeet(lower);
+function containsBadWord(name) {
+  const lower = name.toLowerCase().trim();
+  const normalized = normalizeLeet(lower);
+  const clean = normalized.replace(/[^a-zà-ÿ0-9]/g, '');
+  const cleanSpaced = normalized.replace(/[^a-zà-ÿ0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  const noSpaces = lower.replace(/\s/g, '');
 
-  var clean = normalized.replace(/[^a-zà-ÿ0-9]/g, '');
-  var cleanSpaced = normalized.replace(/[^a-zà-ÿ0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
-
-  for(var i = 0; i < BAD_WORDS_ALL.length; i++){
-    var word = BAD_WORDS_ALL[i].toLowerCase();
-    if(lower.indexOf(word) !== -1) return true;
-    if(normalized.indexOf(word) !== -1) return true;
-    if(clean.indexOf(word.replace(/[^a-zà-ÿ0-9]/g, '')) !== -1) return true;
-    if(cleanSpaced.indexOf(word) !== -1) return true;
+  for (let i = 0; i < BAD_WORDS_ALL.length; i++) {
+    const word = BAD_WORDS_ALL[i].toLowerCase();
+    const wordNoSpace = word.replace(/\s/g, '');
+    if (lower.indexOf(word) !== -1) return true;
+    if (normalized.indexOf(word) !== -1) return true;
+    if (clean.indexOf(word.replace(/[^a-zà-ÿ0-9]/g, '')) !== -1) return true;
+    if (cleanSpaced.indexOf(word) !== -1) return true;
+    if (noSpaces.indexOf(wordNoSpace) !== -1) return true;
   }
 
-  if(/(.)(\1){5,}/.test(lower)) return true;
-  if(/^\d+$/.test(lower)) return true;
-
-  var noSpaces = lower.replace(/\s/g, '');
-  for(var j = 0; j < BAD_WORDS_ALL.length; j++){
-    var w = BAD_WORDS_ALL[j].toLowerCase().replace(/\s/g, '');
-    if(noSpaces.indexOf(w) !== -1) return true;
-  }
+  if (/(.)(\1){5,}/.test(lower)) return true;
+  if (/^\d+$/.test(lower)) return true;
 
   return false;
 }
 
-function checkNameFilter(){
-  var input = document.getElementById("join-name-input");
-  var warning = document.getElementById("name-filter-warning");
-  var btn = document.getElementById("btn-join-room");
-  var name = input.value.trim();
-  if(name && containsBadWord(name)){
+function checkNameFilter() {
+  const input = document.getElementById("join-name-input");
+  const warning = document.getElementById("name-filter-warning");
+  const btn = document.getElementById("btn-join-room");
+  const name = input.value.trim();
+  if (name && containsBadWord(name)) {
     warning.classList.add("show");
     btn.disabled = true;
     input.style.borderColor = "var(--bloom)";
@@ -204,331 +266,496 @@ function checkNameFilter(){
 }
 
 /* ============== STATE ============== */
-var role = null;
-var code = null;
-var myPid = null, myName = "", myAvatar = AVATARS[0];
-var lastSeenStatus = null, lastSeenQIndex = -1;
-var hostPollTimer = null, playerPollTimer = null, tickTimer = null;
-var localMeta = null;
-var hasAnsweredThisQ = false;
-var hostRoster = {};
-var db = null;
-var roomRef = null;
-var isDemoMode = false;
-var audioCtx = null;
-var podiumRevealIndex = 0;
-var podiumItems = [];
-var livePodiumVisible = false;
-var myStreak = 0;
-var myBestStreak = 0;
+let role = null;
+let code = null;
+let myPid = null;
+let myName = "";
+let myAvatar = AVATARS[0];
+let lastSeenStatus = null;
+let lastSeenQIndex = -1;
+let hostPollTimer = null;
+let playerPollTimer = null;
+let tickTimer = null;
+let localMeta = null;
+let hasAnsweredThisQ = false;
+let hostRoster = {};
+let db = null;
+let roomRef = null;
+let isDemoMode = false;
+let audioCtx = null;
+let podiumRevealIndex = 0;
+let podiumItems = [];
+let livePodiumVisible = false;
+let myStreak = 0;
+let myBestStreak = 0;
 
 /* ============== AUDIO ============== */
-function initAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
-function playTone(freq, type, duration, vol){
-  if(!audioCtx) return;
-  vol = vol || 0.15;
-  try{
-    var osc = audioCtx.createOscillator();
-    var gain = audioCtx.createGain();
-    osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + duration);
-  }catch(e){}
-}
-function sfxCorrect(){
-  playTone(523,"sine",0.15,0.12);
-  setTimeout(function(){playTone(659,"sine",0.15,0.12);},120);
-  setTimeout(function(){playTone(784,"sine",0.3,0.12);},240);
-}
-function sfxWrong(){
-  playTone(200,"sawtooth",0.3,0.08);
-  setTimeout(function(){playTone(150,"sawtooth",0.4,0.08);},150);
-}
-function sfxTick(){ playTone(800,"sine",0.05,0.05); }
-function sfxJoin(){
-  playTone(440,"sine",0.1,0.1);
-  setTimeout(function(){playTone(554,"sine",0.1,0.1);},100);
-}
-function sfxStart(){
-  playTone(330,"sine",0.2,0.1);
-  setTimeout(function(){playTone(440,"sine",0.2,0.1);},200);
-  setTimeout(function(){playTone(554,"sine",0.2,0.1);},400);
-  setTimeout(function(){playTone(659,"sine",0.4,0.15);},600);
-}
-function sfxCountdown(n){
-  var base = 440 + (3-n)*110;
-  playTone(base,"sine",0.15,0.12);
-}
-function sfxReveal(){
-  playTone(440,"sine",0.1,0.1);
-  setTimeout(function(){playTone(554,"sine",0.1,0.1);},100);
-  setTimeout(function(){playTone(659,"sine",0.2,0.12);},200);
-}
-function sfxWinner(){
-  playTone(523,"sine",0.2,0.12);
-  setTimeout(function(){playTone(659,"sine",0.2,0.12);},200);
-  setTimeout(function(){playTone(784,"sine",0.2,0.12);},400);
-  setTimeout(function(){playTone(1047,"sine",0.5,0.15);},600);
-}
-function sfxDrumRoll(){
-  for(var i=0;i<8;i++){
-    (function(idx){
-      setTimeout(function(){playTone(100+idx*20,"triangle",0.08,0.06);},idx*80);
-    })(i);
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
 }
-function sfxStreak(n){
-  var base = 440 + Math.min(n, 10) * 50;
-  playTone(base,"sine",0.15,0.1);
-  setTimeout(function(){playTone(base+110,"sine",0.15,0.1);},100);
-  setTimeout(function(){playTone(base+220,"sine",0.2,0.12);},200);
+
+function playTone(freq, type, duration, vol) {
+  if (!audioCtx) return;
+  vol = vol || 0.12;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch (e) {}
+}
+
+function sfxCorrect() {
+  playTone(523, "sine", 0.15, 0.10);
+  setTimeout(() => playTone(659, "sine", 0.15, 0.10), 120);
+  setTimeout(() => playTone(784, "sine", 0.30, 0.10), 240);
+  setTimeout(() => playTone(1047, "sine", 0.40, 0.12), 400);
+}
+
+function sfxWrong() {
+  playTone(180, "sawtooth", 0.25, 0.06);
+  setTimeout(() => playTone(140, "sawtooth", 0.35, 0.06), 150);
+  setTimeout(() => playTone(100, "sawtooth", 0.40, 0.05), 350);
+}
+
+function sfxTick() {
+  playTone(900, "sine", 0.04, 0.04);
+}
+
+function sfxJoin() {
+  playTone(440, "sine", 0.10, 0.08);
+  setTimeout(() => playTone(554, "sine", 0.10, 0.08), 100);
+  setTimeout(() => playTone(659, "sine", 0.15, 0.10), 200);
+}
+
+function sfxStart() {
+  playTone(330, "sine", 0.18, 0.08);
+  setTimeout(() => playTone(440, "sine", 0.18, 0.08), 180);
+  setTimeout(() => playTone(554, "sine", 0.18, 0.08), 360);
+  setTimeout(() => playTone(659, "sine", 0.35, 0.12), 540);
+  setTimeout(() => playTone(880, "sine", 0.50, 0.14), 750);
+}
+
+function sfxCountdown(n) {
+  const base = 440 + (3 - n) * 120;
+  playTone(base, "sine", 0.15, 0.10);
+}
+
+function sfxReveal() {
+  playTone(440, "sine", 0.10, 0.08);
+  setTimeout(() => playTone(554, "sine", 0.10, 0.08), 100);
+  setTimeout(() => playTone(659, "sine", 0.15, 0.10), 200);
+  setTimeout(() => playTone(880, "sine", 0.25, 0.12), 350);
+}
+
+function sfxWinner() {
+  const notes = [523, 659, 784, 1047, 1319];
+  notes.forEach((note, i) => {
+    setTimeout(() => playTone(note, "sine", 0.25, 0.10), i * 180);
+  });
+  setTimeout(() => playTone(1568, "sine", 0.80, 0.14), notes.length * 180);
+}
+
+function sfxDrumRoll() {
+  for (let i = 0; i < 10; i++) {
+    setTimeout(() => playTone(80 + i * 25, "triangle", 0.07, 0.05), i * 70);
+  }
+}
+
+function sfxStreak(n) {
+  const base = 440 + Math.min(n, 10) * 55;
+  playTone(base, "sine", 0.12, 0.08);
+  setTimeout(() => playTone(base + 110, "sine", 0.12, 0.08), 90);
+  setTimeout(() => playTone(base + 220, "sine", 0.18, 0.10), 180);
+  setTimeout(() => playTone(base + 330, "sine", 0.25, 0.12), 300);
+}
+
+function sfxPlayerJoined() {
+  playTone(600, "sine", 0.08, 0.06);
+  setTimeout(() => playTone(750, "sine", 0.12, 0.06), 80);
 }
 
 /* ============== FIREBASE INIT ============== */
-function initFirebase(){
-  try{
-    if(firebaseConfig.apiKey.indexOf("XXXX") === -1){
+function initFirebase() {
+  try {
+    if (firebaseConfig.apiKey.indexOf("XXXX") === -1 && typeof firebase !== 'undefined') {
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
       updateConnStatus(true);
       return true;
     }
-  }catch(e){ console.error("Firebase init error:", e); }
+  } catch (e) {
+    console.error("Firebase init error:", e);
+  }
   updateConnStatus(false);
   return false;
 }
-function updateConnStatus(online){
-  var el = document.getElementById("conn-status");
-  if(!el) return;
-  if(online){ el.className="conn-status online"; el.textContent="- online"; }
-  else { el.className="conn-status offline"; el.textContent="- offline - modo demo ativo"; }
+
+function updateConnStatus(online) {
+  const el = document.getElementById("conn-status");
+  if (!el) return;
+  const dot = el.querySelector('.conn-dot');
+  const text = el.querySelector('.conn-text');
+  if (online) {
+    el.className = "conn-status online";
+    if (text) text.textContent = "online";
+    if (dot) {
+      dot.style.background = "var(--leaf)";
+      dot.style.boxShadow = "0 0 6px var(--leaf)";
+      dot.style.animation = "none";
+    }
+  } else {
+    el.className = "conn-status offline";
+    if (text) text.textContent = "offline — demo ativo";
+    if (dot) {
+      dot.style.background = "var(--bloom)";
+      dot.style.boxShadow = "0 0 6px var(--bloom)";
+    }
+  }
 }
 
 /* ============== DEMO MODE ============== */
-function enableDemoMode(){
-  isDemoMode = true; updateConnStatus(false);
-  document.getElementById("demo-badge").style.display="block";
+function enableDemoMode() {
+  isDemoMode = true;
+  updateConnStatus(false);
+  const badge = document.getElementById("demo-badge");
+  if (badge) badge.style.display = "flex";
   window.demoStorage = {};
   window.demoListeners = {};
 }
-function toggleDemoMode(){ isDemoMode = !isDemoMode; location.reload(); }
 
-function demoSet(path, val){
+function toggleDemoMode() {
+  isDemoMode = !isDemoMode;
+  location.reload();
+}
+
+function demoSet(path, val) {
   window.demoStorage[path] = JSON.parse(JSON.stringify(val));
-  var cbs = window.demoListeners[path] || [];
-  cbs.forEach(function(cb){ cb({val: function(){ return window.demoStorage[path]; }, exists: function(){ return true; }}); });
+  const cbs = window.demoListeners[path] || [];
+  cbs.forEach(cb => cb({
+    val: () => window.demoStorage[path],
+    exists: () => true
+  }));
 }
-function demoGet(path){ return window.demoStorage[path] || null; }
-function demoOnValue(path, cb){
-  if(!window.demoListeners[path]) window.demoListeners[path]=[];
+
+function demoGet(path) {
+  return window.demoStorage[path] || null;
+}
+
+function demoOnValue(path, cb) {
+  if (!window.demoListeners[path]) window.demoListeners[path] = [];
   window.demoListeners[path].push(cb);
-  var val = window.demoStorage[path];
-  if(val!==undefined) cb({val: function(){ return val; }, exists: function(){ return true; }});
+  const val = window.demoStorage[path];
+  if (val !== undefined) cb({ val: () => val, exists: () => true });
 }
-function demoOff(path){ window.demoListeners[path]=[]; }
+
+function demoOff(path) {
+  window.demoListeners[path] = [];
+}
 
 /* ============== DB WRAPPER ============== */
-function dbRef(path){
-  if(isDemoMode){
+function dbRef(path) {
+  if (isDemoMode) {
     return {
-      set: function(val){ return Promise.resolve(demoSet(path, val)); },
-      get: function(){ return Promise.resolve({val: function(){ return demoGet(path); }, exists: function(){ return demoGet(path)!==null; }}); },
-      on: function(evt, cb){ if(evt==="value") demoOnValue(path, cb); },
-      off: function(evt){ if(evt==="value") demoOff(path); },
-      child: function(sub){ return dbRef(path+"/"+sub); },
-      once: function(evt){ return Promise.resolve({val: function(){ return demoGet(path); }, exists: function(){ return demoGet(path)!==null; }}); }
+      set: (val) => Promise.resolve(demoSet(path, val)),
+      get: () => Promise.resolve({
+        val: () => demoGet(path),
+        exists: () => demoGet(path) !== null
+      }),
+      on: (evt, cb) => { if (evt === "value") demoOnValue(path, cb); },
+      off: (evt) => { if (evt === "value") demoOff(path); },
+      child: (sub) => dbRef(path + "/" + sub),
+      once: (evt) => Promise.resolve({
+        val: () => demoGet(path),
+        exists: () => demoGet(path) !== null
+      })
     };
   }
-  if(!db) return null;
+  if (!db) return null;
   return db.ref(path);
 }
-function dbPath(){ return Array.prototype.slice.call(arguments).join("/"); }
+
+function dbPath(...parts) {
+  return parts.join("/");
+}
 
 /* ============== UTIL ============== */
-function show(id){
-  var screens = document.querySelectorAll(".screen");
-  for(var i=0;i<screens.length;i++) screens[i].classList.remove("active");
-  var el = document.getElementById(id);
-  if(el) el.classList.add("active");
-}
-function uid(){ return "p"+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
-function roomCode(){ return String(Math.floor(100000+Math.random()*900000)); }
-function escapeHtml(s){
-  return (s||"").replace(/[&<>"']/g, function(c){
-    return ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c];
-  });
+function show(id) {
+  const screens = document.querySelectorAll(".screen");
+  screens.forEach(s => s.classList.remove("active"));
+  const el = document.getElementById(id);
+  if (el) {
+    // Small delay for transition
+    requestAnimationFrame(() => {
+      el.classList.add("active");
+    });
+  }
 }
 
-function calcPoints(elapsedMs, streak){
-  var clamped = Math.max(0, Math.min(QUESTION_MS, elapsedMs));
-  var ratio = 1 - (clamped / QUESTION_MS);
-  var base = Math.round(500 + 500*ratio);
-
-  var streakBonus = Math.min(streak, 10) * 0.10;
-  var total = Math.round(base * (1 + streakBonus));
-
-  return { base: base, bonus: Math.round(base * streakBonus), total: total };
+function uid() {
+  return "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-function spawnConfetti(){
-  var colors = ["#e0568f","#7fbf7f","#d4af37","#f3a6c4","#a8e6a8","#ff6b6b","#4ecdc4"];
-  for(var i=0;i<40;i++){
-    var el = document.createElement("div");
-    el.className="confetti";
-    el.style.left = (Math.random()*100)+"vw";
+function roomCode() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+function escapeHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s || "";
+  return div.innerHTML;
+}
+
+function calcPoints(elapsedMs, streak) {
+  const clamped = Math.max(0, Math.min(QUESTION_MS, elapsedMs));
+  const ratio = 1 - (clamped / QUESTION_MS);
+  const base = Math.round(500 + 500 * ratio);
+  const streakBonus = Math.min(streak, 10) * 0.10;
+  const total = Math.round(base * (1 + streakBonus));
+  return { base, bonus: Math.round(base * streakBonus), total };
+}
+
+/* ============== PARTICLES & EFFECTS ============== */
+function spawnConfetti() {
+  const colors = ["#e07098", "#6abf6a", "#d4b840", "#f0c0d0", "#90e090", "#ff7b7b", "#5ecdc4"];
+  for (let i = 0; i < 50; i++) {
+    const el = document.createElement("div");
+    el.className = "confetti";
+    el.style.left = (Math.random() * 100) + "vw";
     el.style.top = "-10px";
-    el.style.width = (6+Math.random()*10)+"px";
-    el.style.height = (6+Math.random()*10)+"px";
-    el.style.background = colors[Math.floor(Math.random()*colors.length)];
-    el.style.borderRadius = Math.random()>0.5?"50%":"2px";
-    el.style.animationDuration = (2+Math.random()*2)+"s";
-    el.style.animationDelay = (Math.random()*0.5)+"s";
+    const size = 6 + Math.random() * 10;
+    el.style.width = size + "px";
+    el.style.height = size + "px";
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.borderRadius = Math.random() > 0.5 ? "50%" : "3px";
+    el.style.animationDuration = (2 + Math.random() * 2.5) + "s";
+    el.style.animationDelay = (Math.random() * 0.6) + "s";
+    el.style.opacity = 0.7 + Math.random() * 0.3;
     document.body.appendChild(el);
-    setTimeout(function(){ el.remove(); }, 4500);
+    setTimeout(() => el.remove(), 5000);
   }
 }
-function spawnLeafFall(){
-  var el = document.createElement("div");
-  el.className="leaf-fall";
-  var leaves = ["🍃","🌸","🌿","🍂","🌾","🌼","🌺","🌻"];
-  el.textContent = leaves[Math.floor(Math.random()*leaves.length)];
-  el.style.left = (Math.random()*100)+"vw";
-  el.style.animationDuration = (3+Math.random()*3)+"s";
-  el.style.fontSize = (14+Math.random()*16)+"px";
+
+function spawnLeafFall() {
+  const el = document.createElement("div");
+  el.className = "leaf-fall";
+  const leaves = ["🍃", "🌸", "🌿", "🍂", "🌾", "🌼", "🌺", "🌻", "🌱"];
+  el.textContent = leaves[Math.floor(Math.random() * leaves.length)];
+  el.style.left = (Math.random() * 100) + "vw";
+  el.style.animationDuration = (3 + Math.random() * 4) + "s";
+  el.style.fontSize = (14 + Math.random() * 18) + "px";
+  el.style.opacity = 0.4 + Math.random() * 0.4;
   document.body.appendChild(el);
-  setTimeout(function(){ el.remove(); }, 7000);
+  setTimeout(() => el.remove(), 8000);
 }
-var leafInterval = null;
-function startLeafFall(){ if(leafInterval) return; leafInterval = setInterval(spawnLeafFall, 250); }
-function stopLeafFall(){ clearInterval(leafInterval); leafInterval=null; }
 
-function spawnParticles(){
-  var colors = ["#7fbf7f","#e0568f","#d4af37","#a8e6a8"];
-  for(var i=0;i<15;i++){
-    var el = document.createElement("div");
-    el.className="particle";
-    el.style.left = (Math.random()*100)+"vw";
+let leafInterval = null;
+function startLeafFall() {
+  if (leafInterval) return;
+  leafInterval = setInterval(spawnLeafFall, 300);
+}
+function stopLeafFall() {
+  clearInterval(leafInterval);
+  leafInterval = null;
+}
+
+function spawnParticles() {
+  const colors = ["#6abf6a", "#e07098", "#d4b840", "#90e090"];
+  for (let i = 0; i < 20; i++) {
+    const el = document.createElement("div");
+    el.className = "particle";
+    el.style.left = (Math.random() * 100) + "vw";
     el.style.bottom = "-20px";
-    el.style.width = (3+Math.random()*6)+"px";
-    el.style.height = el.style.width;
-    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    const size = 3 + Math.random() * 7;
+    el.style.width = size + "px";
+    el.style.height = size + "px";
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
     el.style.borderRadius = "50%";
-    el.style.animation = "float-up "+(4+Math.random()*4)+"s linear forwards";
-    el.style.animationDelay = (Math.random()*2)+"s";
+    el.style.animation = `float-up ${4 + Math.random() * 5}s linear forwards`;
+    el.style.animationDelay = (Math.random() * 3) + "s";
+    el.style.opacity = 0.3 + Math.random() * 0.4;
     document.body.appendChild(el);
-    setTimeout(function(){ el.remove(); }, 9000);
+    setTimeout(() => el.remove(), 10000);
   }
 }
 
-function showCountdown(onComplete){
-  var overlay = document.createElement("div");
+function showCountdown(onComplete) {
+  const overlay = document.createElement("div");
   overlay.className = "countdown-overlay";
-  overlay.innerHTML = '<div class="countdown-num" id="cd-num">3</div><div class="countdown-label">Preparar...</div>';
+  overlay.innerHTML = `
+    <div class="countdown-num" id="cd-num">3</div>
+    <div class="countdown-label">Preparar...</div>
+  `;
   document.body.appendChild(overlay);
 
-  var count = 3;
-  var labels = ["Preparar...","Apontar...","Ja!"];
+  let count = 3;
+  const labels = ["Preparar...", "Apontar...", "Já!"];
 
-  function tick(){
+  function tick() {
     sfxCountdown(count);
-    var numEl = document.getElementById("cd-num");
-    var labelEl = overlay.querySelector(".countdown-label");
-    if(numEl) numEl.textContent = count;
-    if(labelEl) labelEl.textContent = labels[3-count];
-
-    if(numEl){
+    const numEl = document.getElementById("cd-num");
+    const labelEl = overlay.querySelector(".countdown-label");
+    if (numEl) {
+      numEl.textContent = count;
       numEl.style.animation = "none";
-      numEl.offsetHeight;
-      numEl.style.animation = "count-pop 0.5s cubic-bezier(0.2,1.4,0.4,1)";
+      void numEl.offsetHeight;
+      numEl.style.animation = "count-pop 0.5s cubic-bezier(0.2,1.6,0.4,1)";
     }
+    if (labelEl) labelEl.textContent = labels[3 - count];
 
     count--;
-    if(count >= 0){
+    if (count >= 0) {
       setTimeout(tick, 1000);
     } else {
       overlay.classList.add("hide");
-      setTimeout(function(){
+      setTimeout(() => {
         overlay.remove();
-        if(onComplete) onComplete();
-      }, 300);
+        if (onComplete) onComplete();
+      }, 350);
     }
   }
 
-  setTimeout(tick, 300);
+  setTimeout(tick, 400);
 }
 
 /* ============== NAV ============== */
-function goLanding(){ role=null; show("screen-landing"); }
+function goLanding() {
+  role = null;
+  show("screen-landing");
+  startAmbientLeaves();
+}
+
+function startAmbientLeaves() {
+  const container = document.getElementById("floating-leaves");
+  if (!container) return;
+  container.innerHTML = "";
+  const leaves = ["🍃", "🌸", "🌿", "🍂", "🌾"];
+  for (let i = 0; i < 8; i++) {
+    const el = document.createElement("span");
+    el.textContent = leaves[Math.floor(Math.random() * leaves.length)];
+    el.style.position = "absolute";
+    el.style.left = (Math.random() * 100) + "%";
+    el.style.top = (Math.random() * 100) + "%";
+    el.style.fontSize = (12 + Math.random() * 20) + "px";
+    el.style.opacity = 0.15 + Math.random() * 0.2;
+    el.style.animation = `orb-float ${10 + Math.random() * 15}s ease-in-out infinite`;
+    el.style.animationDelay = (Math.random() * -10) + "s";
+    el.style.pointerEvents = "none";
+    container.appendChild(el);
+  }
+}
 
 /* ============== HOST FLOW ============== */
-async function goHostSetup(){
+async function goHostSetup() {
   initAudio();
-  role="host";
+  role = "host";
   show("screen-host-setup");
 
-  if(!initFirebase()){ enableDemoMode(); }
+  if (!initFirebase()) {
+    enableDemoMode();
+  }
 
   code = roomCode();
-  var meta = {status:"lobby", qIndex:-1, qStartAt:0, duration:QUESTION_MS, total:QUESTIONS.length, createdAt:Date.now()};
+  const meta = {
+    status: "lobby",
+    qIndex: -1,
+    qStartAt: 0,
+    duration: QUESTION_MS,
+    total: QUESTIONS.length,
+    createdAt: Date.now()
+  };
   localMeta = meta;
 
-  var metaRef = dbRef(dbPath("broto", code, "meta"));
-  if(metaRef) await metaRef.set(meta);
+  const metaRef = dbRef(dbPath("broto", code, "meta"));
+  if (metaRef) await metaRef.set(meta);
 
   document.getElementById("host-code").textContent = code.replace(/(\d{3})(\d{3})/, "$1 $2");
-  document.getElementById("qr-box").innerHTML = "";
-  try{
-    var joinUrl = location.origin + location.pathname + "?code=" + code;
-    new QRCode(document.getElementById("qr-box"), {text: joinUrl, width:160, height:160, colorDark:"#0a1f12", colorLight:"#f2ead4", correctLevel:QRCode.CorrectLevel.M});
-  }catch(e){}
+
+  const qrBox = document.getElementById("qr-box");
+  qrBox.innerHTML = "";
+  try {
+    const joinUrl = location.origin + location.pathname + "?code=" + code;
+    document.getElementById("qr-url").textContent = joinUrl;
+    new QRCode(qrBox, {
+      text: joinUrl,
+      width: 160,
+      height: 160,
+      colorDark: "#0a1f12",
+      colorLight: "#f0ead6",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch (e) {}
 
   show("screen-host-lobby");
 
-  var playersRef = dbRef(dbPath("broto", code, "players"));
-  if(playersRef) playersRef.on("value", function(snap){
-    var val = snap.val() || {};
-    hostRoster = val;
-    if(document.getElementById("screen-host-lobby").classList.contains("active")){
-      renderLobbyPlayers();
-    }
-  });
+  const playersRef = dbRef(dbPath("broto", code, "players"));
+  if (playersRef) {
+    playersRef.on("value", snap => {
+      const val = snap.val() || {};
+      const prevCount = Object.keys(hostRoster).length;
+      hostRoster = val;
+      if (document.getElementById("screen-host-lobby").classList.contains("active")) {
+        renderLobbyPlayers();
+        const newCount = Object.keys(val).length;
+        if (newCount > prevCount && prevCount > 0) {
+          sfxPlayerJoined();
+        }
+      }
+    });
+  }
 
-  var metaR = dbRef(dbPath("broto", code, "meta"));
-  if(metaR) metaR.on("value", function(snap){
-    var m = snap.val();
-    if(m) localMeta = m;
-  });
+  const metaR = dbRef(dbPath("broto", code, "meta"));
+  if (metaR) {
+    metaR.on("value", snap => {
+      const m = snap.val();
+      if (m) localMeta = m;
+    });
+  }
 }
 
-function renderLobbyPlayers(){
-  var grid = document.getElementById("host-players");
-  var list = [];
-  for(var key in hostRoster) list.push(hostRoster[key]);
-  list.sort(function(a,b){ return (a.joinedAt||0)-(b.joinedAt||0); });
+function renderLobbyPlayers() {
+  const grid = document.getElementById("host-players");
+  const list = [];
+  for (const key in hostRoster) list.push(hostRoster[key]);
+  list.sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0));
 
-  var html = "";
-  for(var i=0;i<list.length;i++){
-    var p = list[i];
-    var palette = p.avatarPalette || AVATAR_PALETTES[0];
-    var avUrl = generateAvatarSVG(palette, 80);
-    html += '<div class="sprout"><img class="av" src="'+avUrl+'" alt="'+escapeHtml(p.name)+'" style="border-radius:50%;width:40px;height:40px;object-fit:cover;"><div class="nm">'+escapeHtml(p.name)+'</div></div>';
+  let html = "";
+  for (let i = 0; i < list.length; i++) {
+    const p = list[i];
+    const palette = p.avatarPalette || AVATAR_DATA[0];
+    const avUrl = getAvatarUrl(AVATAR_DATA.findIndex(d => d.name === p.avatar) || 0, 80);
+    html += `<div class="sprout" style="animation-delay:${i * 0.05}s">
+      <img class="av" src="${avUrl}" alt="${escapeHtml(p.name)}" 
+           style="border-radius:50%;width:40px;height:40px;object-fit:cover;"
+           onerror="this.src='${generateArtisticAvatar(AVATAR_DATA[0],80)}'">
+      <div class="nm">${escapeHtml(p.name)}</div>
+    </div>`;
   }
   grid.innerHTML = html;
 
-  document.getElementById("host-count").textContent = list.length+" pessoa"+(list.length===1?"":"s")+" na sala";
-  var btn = document.getElementById("btn-start-game");
-  if(btn) btn.disabled = list.length === 0;
+  document.getElementById("host-count-text").textContent = list.length + " pessoa" + (list.length === 1 ? "" : "s") + " na sala";
+  const btn = document.getElementById("btn-start-game");
+  if (btn) btn.disabled = list.length === 0;
 }
 
-async function hostStartGame(){
-  initAudio(); sfxStart();
+async function hostStartGame() {
+  initAudio();
+  sfxStart();
 
-  showCountdown(async function(){
-    localMeta.qIndex = 0; localMeta.status="question"; localMeta.qStartAt = Date.now();
-    var metaRef = dbRef(dbPath("broto", code, "meta"));
-    if(metaRef) await metaRef.set(localMeta);
+  showCountdown(async () => {
+    localMeta.qIndex = 0;
+    localMeta.status = "question";
+    localMeta.qStartAt = Date.now();
+    const metaRef = dbRef(dbPath("broto", code, "meta"));
+    if (metaRef) await metaRef.set(localMeta);
     renderHostQuestion();
     show("screen-host-game");
     startHostTimerTick();
@@ -540,89 +767,103 @@ async function hostStartGame(){
   });
 }
 
-function listenForAnswers(){
-  var ansRef = dbRef(dbPath("broto", code, "answers", localMeta.qIndex));
-  if(ansRef) ansRef.on("value", function(snap){
-    var val = snap.val() || {};
-    var count = 0;
-    for(var k in val) count++;
-    var total = 0;
-    for(var k in hostRoster) total++;
-    var el = document.getElementById("host-answered");
-    if(el) el.textContent = count+" de "+total+" respostas";
-  });
+function listenForAnswers() {
+  const ansRef = dbRef(dbPath("broto", code, "answers", localMeta.qIndex));
+  if (ansRef) {
+    ansRef.on("value", snap => {
+      const val = snap.val() || {};
+      let count = 0;
+      for (const k in val) count++;
+      let total = 0;
+      for (const k in hostRoster) total++;
+      const el = document.getElementById("host-answered");
+      if (el) el.textContent = count + " de " + total + " respostas";
+    });
+  }
 }
 
-function renderHostQuestion(){
-  var qd = QUESTIONS[localMeta.qIndex];
-  document.getElementById("host-qcounter").textContent = "Pergunta "+(localMeta.qIndex+1)+" de "+QUESTIONS.length;
+function renderHostQuestion() {
+  const qd = QUESTIONS[localMeta.qIndex];
+  document.getElementById("host-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + QUESTIONS.length;
+  document.getElementById("host-qnum").textContent = localMeta.qIndex + 1;
   document.getElementById("host-answered").textContent = "0 respostas";
   document.getElementById("host-qtext").textContent = qd.q;
 
-  var optsHtml = "";
-  for(var i=0;i<qd.opts.length;i++){
-    optsHtml += '<div class="opt o'+i+'" id="host-opt-'+i+'"><span class="mk">'+OPT_MARK[i]+'</span><span>'+qd.opts[i]+'</span></div>';
+  let optsHtml = "";
+  for (let i = 0; i < qd.opts.length; i++) {
+    optsHtml += `<div class="opt o${i}" id="host-opt-${i}">
+      <span class="mk">${OPT_MARK[i]}</span>
+      <span>${qd.opts[i]}</span>
+    </div>`;
   }
   document.getElementById("host-opts").innerHTML = optsHtml;
 
-  document.getElementById("btn-reveal").style.display="inline-flex";
-  document.getElementById("btn-next").style.display="none";
+  document.getElementById("btn-reveal").style.display = "inline-flex";
+  document.getElementById("btn-next").style.display = "none";
   document.getElementById("host-timerbar").style.width = "100%";
 }
 
-function startHostTimerTick(){
+function startHostTimerTick() {
   clearInterval(tickTimer);
-  tickTimer = setInterval(function(){
-    if(!localMeta || localMeta.status!=="question") return;
-    var remain = localMeta.duration - (Date.now()-localMeta.qStartAt);
-    var pct = Math.max(0, Math.min(100, (remain/localMeta.duration)*100));
-    var bar = document.getElementById("host-timerbar");
-    if(bar) bar.style.width = pct+"%";
-    if(remain<=3000 && remain>2500) sfxTick();
-    if(remain<=0){ clearInterval(tickTimer); hostReveal(); }
+  tickTimer = setInterval(() => {
+    if (!localMeta || localMeta.status !== "question") return;
+    const remain = localMeta.duration - (Date.now() - localMeta.qStartAt);
+    const pct = Math.max(0, Math.min(100, (remain / localMeta.duration) * 100));
+    const bar = document.getElementById("host-timerbar");
+    if (bar) bar.style.width = pct + "%";
+    if (remain <= 3000 && remain > 2500) sfxTick();
+    if (remain <= 0) {
+      clearInterval(tickTimer);
+      hostReveal();
+    }
   }, 150);
 }
 
-async function hostReveal(){
-  if(localMeta.status!=="question") return;
+async function hostReveal() {
+  if (localMeta.status !== "question") return;
   clearInterval(tickTimer);
-  localMeta.status="reveal";
-  var metaRef = dbRef(dbPath("broto", code, "meta"));
-  if(metaRef) await metaRef.set(localMeta);
+  localMeta.status = "reveal";
+  const metaRef = dbRef(dbPath("broto", code, "meta"));
+  if (metaRef) await metaRef.set(localMeta);
 
-  var qi = localMeta.qIndex, qd = QUESTIONS[qi];
-  var ansRef = dbRef(dbPath("broto", code, "answers", qi));
-  var snap = ansRef ? await ansRef.get() : {val: function(){ return null; }};
-  var answers = snap.val() || {};
-  var counts=[0,0,0,0];
-  for(var key in answers){
-    var a = answers[key];
-    if(a && a.choice>=0 && a.choice<4) counts[a.choice]++;
+  const qi = localMeta.qIndex;
+  const qd = QUESTIONS[qi];
+  const ansRef = dbRef(dbPath("broto", code, "answers", qi));
+  const snap = ansRef ? await ansRef.get() : { val: () => null };
+  const answers = snap.val() || {};
+  const counts = [0, 0, 0, 0];
+  for (const key in answers) {
+    const a = answers[key];
+    if (a && a.choice >= 0 && a.choice < 4) counts[a.choice]++;
   }
-  var total = 0;
-  for(var k in answers) total++;
+  let total = 0;
+  for (const k in answers) total++;
   total = Math.max(1, total);
 
-  for(var i=0;i<qd.opts.length;i++){
-    var el = document.getElementById("host-opt-"+i);
-    if(!el) continue;
-    if(i===qd.c) el.classList.add("correct"); else el.classList.add("dim");
-    var pct = Math.round((counts[i]/total)*100);
-    el.innerHTML += '<div class="bar"><i style="width:'+pct+'%"></i></div>';
+  for (let i = 0; i < qd.opts.length; i++) {
+    const el = document.getElementById("host-opt-" + i);
+    if (!el) continue;
+    if (i === qd.c) el.classList.add("correct");
+    else el.classList.add("dim");
+    const pct = Math.round((counts[i] / total) * 100);
+    el.innerHTML += `<div class="bar" style="width:${pct}%"></div>
+      <div class="bar-label">${pct}%</div>`;
   }
 
-  for(var key in answers){
-    var a = answers[key];
-    if(!a || !a.pid) continue;
-    var isCorrect = a.choice===qd.c;
-    var pRef = dbRef(dbPath("broto", code, "players", a.pid));
-    if(pRef){
-      var pSnap = await pRef.get();
-      var p = pSnap.val() || {};
-      p.score = (p.score||0) + (isCorrect ? calcPoints(a.at - localMeta.qStartAt, p.streak||0).total : 0);
-      if(isCorrect) {
-        p.streak = (p.streak||0) + 1;
-        p.bestStreak = Math.max(p.bestStreak||0, p.streak);
+  // Update scores
+  for (const key in answers) {
+    const a = answers[key];
+    if (!a || !a.pid) continue;
+    const isCorrect = a.choice === qd.c;
+    const pRef = dbRef(dbPath("broto", code, "players", a.pid));
+    if (pRef) {
+      const pSnap = await pRef.get();
+      const p = pSnap.val() || {};
+      const pts = isCorrect ? calcPoints(a.at - localMeta.qStartAt, p.streak || 0).total : 0;
+      p.score = (p.score || 0) + pts;
+      if (isCorrect) {
+        p.streak = (p.streak || 0) + 1;
+        p.bestStreak = Math.max(p.bestStreak || 0, p.streak);
       } else {
         p.streak = 0;
       }
@@ -632,340 +873,405 @@ async function hostReveal(){
 
   updateLivePodium();
 
-  document.getElementById("btn-reveal").style.display="none";
-  document.getElementById("btn-next").style.display="inline-flex";
-  document.getElementById("btn-next").textContent = (qi+1<QUESTIONS.length) ? "Proxima ->" : "Ver podio 🏆";
+  document.getElementById("btn-reveal").style.display = "none";
+  document.getElementById("btn-next").style.display = "inline-flex";
+  document.getElementById("btn-next-text").textContent = (qi + 1 < QUESTIONS.length) ? "Próxima →" : "Ver pódio 🏆";
 }
 
-async function hostNext(){
-  if(localMeta.qIndex+1 < QUESTIONS.length){
-    localMeta.qIndex += 1; localMeta.status="question"; localMeta.qStartAt=Date.now();
-    var metaRef = dbRef(dbPath("broto", code, "meta"));
-    if(metaRef) await metaRef.set(localMeta);
+async function hostNext() {
+  if (localMeta.qIndex + 1 < QUESTIONS.length) {
+    localMeta.qIndex += 1;
+    localMeta.status = "question";
+    localMeta.qStartAt = Date.now();
+    const metaRef = dbRef(dbPath("broto", code, "meta"));
+    if (metaRef) await metaRef.set(localMeta);
     renderHostQuestion();
     startHostTimerTick();
     listenForAnswers();
     updateLivePodium();
   } else {
-    localMeta.status="podium";
-    var metaRef = dbRef(dbPath("broto", code, "meta"));
-    if(metaRef) await metaRef.set(localMeta);
+    localMeta.status = "podium";
+    const metaRef = dbRef(dbPath("broto", code, "meta"));
+    if (metaRef) await metaRef.set(localMeta);
     await renderHostPodium();
   }
 }
 
 /* ============== LIVE PODIUM ============== */
-async function updateLivePodium(){
-  if(!livePodiumVisible) return;
-  var playersRef = dbRef(dbPath("broto", code, "players"));
-  var snap = playersRef ? await playersRef.get() : {val: function(){ return null; }};
-  var items = [];
-  var val = snap.val() || {};
-  for(var k in val) if(val[k]) items.push(val[k]);
-  items.sort(function(a,b){ return (b.score||0)-(a.score||0); });
+async function updateLivePodium() {
+  if (!livePodiumVisible) return;
+  const playersRef = dbRef(dbPath("broto", code, "players"));
+  const snap = playersRef ? await playersRef.get() : { val: () => null };
+  const items = [];
+  const val = snap.val() || {};
+  for (const k in val) if (val[k]) items.push(val[k]);
+  items.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-  var container = document.getElementById("live-podium-content");
-  if(!container) return;
+  const container = document.getElementById("live-podium-content");
+  if (!container) return;
 
-  var maxScore = 1;
-  for(var i=0;i<items.length;i++) maxScore = Math.max(maxScore, items[i].score||0);
+  let maxScore = 1;
+  for (let i = 0; i < items.length; i++) maxScore = Math.max(maxScore, items[i].score || 0);
 
-  var html = "";
-  for(var i=0;i<Math.min(items.length,5);i++){
-    var p = items[i];
-    var isLeader = i === 0;
-    var pct = ((p.score||0) / maxScore) * 100;
-    var palette = p.avatarPalette || AVATAR_PALETTES[0];
-    var avUrl = generateAvatarSVG(palette, 36);
-    html += '<div class="live-podium-row '+(isLeader?"leader":"")+'">'+
-      '<span class="lp-rank">#'+(i+1)+'</span>'+
-      '<img class="lp-av" src="'+avUrl+'" alt="" style="border-radius:50%;width:28px;height:28px;object-fit:cover;">'+
-      '<span class="lp-name">'+escapeHtml(p.name)+'</span>'+
-      '<span class="lp-score">'+(p.score||0)+' pts</span>'+
-      '<div class="lp-bar" style="width:'+pct+'%"></div>'+
-    '</div>';
+  let html = "";
+  for (let i = 0; i < Math.min(items.length, 5); i++) {
+    const p = items[i];
+    const isLeader = i === 0;
+    const pct = ((p.score || 0) / maxScore) * 100;
+    const avIdx = AVATAR_DATA.findIndex(d => d.name === p.avatar);
+    const avUrl = getAvatarUrl(avIdx >= 0 ? avIdx : 0, 36);
+    html += `<div class="live-podium-row ${isLeader ? 'leader' : ''}">
+      <span class="lp-rank">#${i + 1}</span>
+      <img class="lp-av" src="${avUrl}" alt="" 
+           style="border-radius:50%;width:28px;height:28px;object-fit:cover;"
+           onerror="this.src='${generateArtisticAvatar(AVATAR_DATA[0],36)}'">
+      <span class="lp-name">${escapeHtml(p.name)}</span>
+      <span class="lp-score">${p.score || 0} pts</span>
+      <div class="lp-bar" style="width:${pct}%"></div>
+    </div>`;
   }
   container.innerHTML = html;
 }
 
 /* ============== FINAL PODIUM ============== */
-async function renderHostPodium(){
+async function renderHostPodium() {
   clearInterval(tickTimer);
   livePodiumVisible = false;
   document.getElementById("live-podium").style.display = "none";
 
-  var playersRef = dbRef(dbPath("broto", code, "players"));
-  var snap = playersRef ? await playersRef.get() : {val: function(){ return null; }};
-  var items = [];
-  var val = snap.val() || {};
-  for(var k in val) if(val[k]) items.push(val[k]);
-  items.sort(function(a,b){ return (b.score||0)-(a.score||0); });
+  const playersRef = dbRef(dbPath("broto", code, "players"));
+  const snap = playersRef ? await playersRef.get() : { val: () => null };
+  const items = [];
+  const val = snap.val() || {};
+  for (const k in val) if (val[k]) items.push(val[k]);
+  items.sort((a, b) => (b.score || 0) - (a.score || 0));
 
   show("screen-host-podium");
   startLeafFall();
 
-  var stage = document.getElementById("host-podium");
+  const stage = document.getElementById("host-podium");
   stage.innerHTML = "";
 
-  var medals = ["🥇","🥈","🥉"];
-  var flowers = ["🌻","🌼","🌸"];
+  const medals = ["🥇", "🥈", "🥉"];
+  const flowers = ["🌻", "🌼", "🌸"];
 
-  for(var idx=0;idx<items.length;idx++){
-    var p = items[idx];
-    var isTop3 = idx < 3;
-    var rank = idx + 1;
-    var medal = isTop3 ? medals[idx] : "";
-    var flower = isTop3 ? flowers[idx] : "🌱";
-    var palette = p.avatarPalette || AVATAR_PALETTES[0];
-    var avUrl = generateAvatarSVG(palette, 56);
-    var topClass = isTop3 ? (idx===0 ? "top-1" : idx===1 ? "top-2" : "top-3") : "";
+  for (let idx = 0; idx < items.length; idx++) {
+    const p = items[idx];
+    const isTop3 = idx < 3;
+    const rank = idx + 1;
+    const medal = isTop3 ? medals[idx] : "";
+    const flower = isTop3 ? flowers[idx] : "🌱";
+    const avIdx = AVATAR_DATA.findIndex(d => d.name === p.avatar);
+    const avUrl = getAvatarUrl(avIdx >= 0 ? avIdx : 0, 56);
+    const topClass = isTop3 ? (idx === 0 ? "top-1" : idx === 1 ? "top-2" : "top-3") : "";
 
-    var step = document.createElement("div");
-    step.className = "podium-step" + (isTop3 && idx === 0 ? " winner" : "") + " " + topClass;
+    const step = document.createElement("div");
+    step.className = "podium-step " + topClass;
     step.id = "podium-step-" + idx;
-    step.innerHTML = 
-      '<div class="step-rank">#'+rank+'</div>'+
-      '<img class="step-av" src="'+avUrl+'" alt="'+escapeHtml(p.name)+'" style="border-radius:50%;width:56px;height:56px;object-fit:cover;" onerror="this.src=\''+generateAvatarSVG(palette,56)+'\'">'+
-      '<div class="step-info">'+
-        '<div class="step-name">'+escapeHtml(p.name)+'</div>'+
-        '<div class="step-score">'+(p.score||0)+' pontos'+(p.bestStreak>2?' · 🔥 serie '+p.bestStreak:'')+'</div>'+
-      '</div>'+
-      '<div class="step-medal">'+(isTop3 ? medal+flower : "")+'</div>'+
-      '<div class="step-bar-bg"></div>'+
-      '<div class="step-bar-fill"></div>';
+    step.innerHTML = `
+      <div class="step-rank">#${rank}</div>
+      <img class="step-av" src="${avUrl}" alt="${escapeHtml(p.name)}" 
+           style="border-radius:50%;width:52px;height:52px;object-fit:cover;"
+           onerror="this.src='${generateArtisticAvatar(AVATAR_DATA[0],56)}'">
+      <div class="step-info">
+        <div class="step-name">${escapeHtml(p.name)}</div>
+        <div class="step-score">${p.score || 0} pontos${p.bestStreak > 2 ? ' · 🔥 série ' + p.bestStreak : ''}</div>
+      </div>
+      <div class="step-medal">${isTop3 ? medal + flower : ""}</div>
+      <div class="step-bar-bg"></div>
+      <div class="step-bar-fill"></div>
+    `;
     stage.appendChild(step);
   }
 
-  var rl = document.getElementById("host-ranklist");
-  var rlHtml = "";
-  for(var i=0;i<items.length;i++){
-    var p = items[i];
-    var palette = p.avatarPalette || AVATAR_PALETTES[0];
-    var avUrl = generateAvatarSVG(palette, 28);
-    rlHtml += '<div class="rank-row" style="animation-delay:'+(i*0.08)+'s"><span class="rn">'+(i+1)+'</span><img src="'+avUrl+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt=""><span>'+escapeHtml(p.name)+'</span><span class="rs">'+(p.score||0)+' pts</span></div>';
+  const rl = document.getElementById("host-ranklist");
+  let rlHtml = "";
+  for (let i = 0; i < items.length; i++) {
+    const p = items[i];
+    const avIdx = AVATAR_DATA.findIndex(d => d.name === p.avatar);
+    const avUrl = getAvatarUrl(avIdx >= 0 ? avIdx : 0, 28);
+    rlHtml += `<div class="rank-row" style="animation-delay:${i * 0.08}s">
+      <span class="rn">${i + 1}</span>
+      <img src="${avUrl}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt=""
+           onerror="this.src='${generateArtisticAvatar(AVATAR_DATA[0],28)}'">
+      <span>${escapeHtml(p.name)}</span>
+      <span class="rs">${p.score || 0} pts</span>
+    </div>`;
   }
   rl.innerHTML = rlHtml;
 
   podiumItems = items;
   podiumRevealIndex = items.length - 1;
-  revealNextPodiumStep();
+  sfxDrumRoll();
+  setTimeout(revealNextPodiumStep, 800);
 }
 
-function revealNextPodiumStep(){
-  if(podiumRevealIndex < 0){
-    setTimeout(function(){
-      var winnerStep = document.getElementById("podium-step-0");
-      if(winnerStep){
+function revealNextPodiumStep() {
+  if (podiumRevealIndex < 0) {
+    setTimeout(() => {
+      const winnerStep = document.getElementById("podium-step-0");
+      if (winnerStep) {
         winnerStep.classList.add("winner-glow");
         sfxWinner();
         spawnConfetti();
-        spawnConfetti();
+        setTimeout(spawnConfetti, 300);
       }
-    }, 600);
+    }, 800);
     return;
   }
 
-  var step = document.getElementById("podium-step-" + podiumRevealIndex);
-  if(step){
+  const step = document.getElementById("podium-step-" + podiumRevealIndex);
+  if (step) {
     step.classList.add("revealed");
     sfxReveal();
 
-    setTimeout(function(){
-      var bar = step.querySelector(".step-bar-fill");
-      if(bar){
-        var maxScore = 1;
-        for(var i=0;i<podiumItems.length;i++) maxScore = Math.max(maxScore, podiumItems[i].score||0);
-        var pct = ((podiumItems[podiumRevealIndex].score||0) / maxScore) * 100;
+    setTimeout(() => {
+      const bar = step.querySelector(".step-bar-fill");
+      if (bar) {
+        let maxScore = 1;
+        for (let i = 0; i < podiumItems.length; i++) {
+          maxScore = Math.max(maxScore, podiumItems[i].score || 0);
+        }
+        const pct = ((podiumItems[podiumRevealIndex].score || 0) / maxScore) * 100;
         bar.style.width = pct + "%";
       }
-    }, 100);
+      const bgBar = step.querySelector(".step-bar-bg");
+      if (bgBar) bgBar.style.width = "100%";
+    }, 150);
   }
 
   podiumRevealIndex--;
-
-  var delay = podiumRevealIndex >= 2 ? 800 : 1200;
+  const delay = podiumRevealIndex >= 2 ? 700 : 1100;
   setTimeout(revealNextPodiumStep, delay);
 }
 
 /* ============== PLAYER FLOW ============== */
-function goJoinCode(){
-  role="player";
+function goJoinCode() {
+  role = "player";
   show("screen-join-code");
-  document.getElementById("join-code-error").textContent="";
+  document.getElementById("join-code-error").textContent = "";
+  setTimeout(() => {
+    const input = document.getElementById("join-code-input");
+    if (input) input.focus();
+  }, 300);
 }
-async function submitCode(){
+
+async function submitCode() {
   initAudio();
-  var val = document.getElementById("join-code-input").value.replace(/\D/g,"");
-  if(val.length!==6){ document.getElementById("join-code-error").textContent="Digite os 6 numeros do codigo."; return; }
+  const val = document.getElementById("join-code-input").value.replace(/\D/g, "");
+  if (val.length !== 6) {
+    document.getElementById("join-code-error").textContent = "Digite os 6 números do código.";
+    return;
+  }
 
-  if(!initFirebase()){ enableDemoMode(); }
+  if (!initFirebase()) {
+    enableDemoMode();
+  }
 
-  var metaRef = dbRef(dbPath("broto", val, "meta"));
-  var snap = metaRef ? await metaRef.get() : {val: function(){ return null; }, exists: function(){ return false; }};
-  if(!snap.exists()){ document.getElementById("join-code-error").textContent="Nao achamos essa sala. Confira o codigo com quem esta apresentando."; return; }
+  const metaRef = dbRef(dbPath("broto", val, "meta"));
+  const snap = metaRef ? await metaRef.get() : { val: () => null, exists: () => false };
+  if (!snap.exists()) {
+    document.getElementById("join-code-error").textContent = "Não achamos essa sala. Confira o código com quem está apresentando.";
+    return;
+  }
 
-  code = val; localMeta = snap.val();
+  code = val;
+  localMeta = snap.val();
   buildAvatarGrid();
   show("screen-join-profile");
+  setTimeout(() => {
+    const input = document.getElementById("join-name-input");
+    if (input) input.focus();
+  }, 300);
 }
-function buildAvatarGrid(){
-  var g = document.getElementById("avatar-grid");
-  var html = "";
-  for(var i=0;i<AVATARS.length;i++){
-    var isSel = i===0 ? " sel" : "";
-    html += '<div class="avatar-opt'+isSel+'" data-idx="'+i+'" onclick="pickAvatar(this)"><img src="'+AVATARS[i].url+'" alt="'+AVATARS[i].name+'" loading="lazy" style="border-radius:50%;width:56px;height:56px;object-fit:cover;"><div class="av-name">'+AVATARS[i].name+'</div></div>';
+
+function buildAvatarGrid() {
+  const g = document.getElementById("avatar-grid");
+  let html = "";
+  for (let i = 0; i < AVATARS.length; i++) {
+    const isSel = i === 0 ? " sel" : "";
+    html += `<div class="avatar-opt${isSel}" data-idx="${i}" onclick="pickAvatar(this)">
+      <img src="${AVATARS[i].url}" alt="${AVATARS[i].name}" loading="lazy" 
+           style="border-radius:50%;width:52px;height:52px;object-fit:cover;">
+      <div class="av-name">${AVATARS[i].name}</div>
+    </div>`;
   }
   g.innerHTML = html;
   myAvatar = AVATARS[0];
 }
-function pickAvatar(el){
-  var opts = document.querySelectorAll(".avatar-opt");
-  for(var i=0;i<opts.length;i++) opts[i].classList.remove("sel");
+
+function pickAvatar(el) {
+  const opts = document.querySelectorAll(".avatar-opt");
+  opts.forEach(o => o.classList.remove("sel"));
   el.classList.add("sel");
   myAvatar = AVATARS[parseInt(el.dataset.idx)];
 }
-async function playerJoinRoom(){
-  var nameInput = document.getElementById("join-name-input");
-  var name = nameInput.value.trim();
-  if(!name){ document.getElementById("join-profile-error").textContent="Escreve um nome ou apelido pra gente te chamar :)"; return; }
-  if(containsBadWord(name)){ 
-    document.getElementById("join-profile-error").textContent="Esse nome nao pode ser usado. Escolha outro.";
-    nameInput.classList.add("shake");
-    setTimeout(function(){ nameInput.classList.remove("shake"); }, 400);
-    return; 
+
+async function playerJoinRoom() {
+  const nameInput = document.getElementById("join-name-input");
+  const name = nameInput.value.trim();
+  if (!name) {
+    document.getElementById("join-profile-error").textContent = "Escreve um nome ou apelido pra gente te chamar :)";
+    return;
   }
-  myName = name.slice(0,18);
+  if (containsBadWord(name)) {
+    document.getElementById("join-profile-error").textContent = "Esse nome não pode ser usado. Escolha outro.";
+    nameInput.classList.add("shake");
+    setTimeout(() => nameInput.classList.remove("shake"), 400);
+    return;
+  }
+  myName = name.slice(0, 18);
   myPid = uid();
-  var p = {pid:myPid, name:myName, avatar:myAvatar.name, avatarUrl:myAvatar.url, avatarPalette: myAvatar.palette, score:0, streak:0, bestStreak:0, joinedAt:Date.now()};
+  const p = {
+    pid: myPid,
+    name: myName,
+    avatar: myAvatar.name,
+    avatarUrl: myAvatar.url,
+    avatarPalette: myAvatar.palette,
+    score: 0,
+    streak: 0,
+    bestStreak: 0,
+    joinedAt: Date.now()
+  };
 
-  var pRef = dbRef(dbPath("broto", code, "players", myPid));
-  if(pRef) await pRef.set(p);
+  const pRef = dbRef(dbPath("broto", code, "players", myPid));
+  if (pRef) await pRef.set(p);
 
-  document.getElementById("player-wait-av-img").src = myAvatar.url;
-  document.getElementById("player-wait-av-img").alt = myAvatar.name;
+  const avImg = document.getElementById("player-wait-av-img");
+  avImg.src = myAvatar.url;
+  avImg.onerror = function() { this.src = generateArtisticAvatar(myAvatar.palette, 80); };
+  avImg.alt = myAvatar.name;
   document.getElementById("player-wait-name").textContent = myName;
   document.getElementById("player-wait-code").textContent = "sala " + code;
   show("screen-player-wait");
-  lastSeenStatus = "lobby"; lastSeenQIndex = -1;
+  lastSeenStatus = "lobby";
+  lastSeenQIndex = -1;
 
-  var metaRef = dbRef(dbPath("broto", code, "meta"));
-  if(metaRef) metaRef.on("value", function(snap){
-    var meta = snap.val();
-    if(meta) handlePlayerMetaChange(meta);
-  });
+  const metaRef = dbRef(dbPath("broto", code, "meta"));
+  if (metaRef) {
+    metaRef.on("value", snap => {
+      const meta = snap.val();
+      if (meta) handlePlayerMetaChange(meta);
+    });
+  }
 }
 
-function handlePlayerMetaChange(meta){
+function handlePlayerMetaChange(meta) {
   localMeta = meta;
-  if(meta.status==="question" && (lastSeenStatus!=="question" || meta.qIndex!==lastSeenQIndex)){
-    lastSeenStatus="question"; lastSeenQIndex=meta.qIndex; hasAnsweredThisQ=false;
+  if (meta.status === "question" && (lastSeenStatus !== "question" || meta.qIndex !== lastSeenQIndex)) {
+    lastSeenStatus = "question";
+    lastSeenQIndex = meta.qIndex;
+    hasAnsweredThisQ = false;
     renderPlayerQuestion();
     show("screen-player-question");
-  } else if(meta.status==="reveal" && lastSeenStatus!=="reveal"){
-    lastSeenStatus="reveal";
-    renderPlayerReveal().then(function(){ show("screen-player-reveal"); });
-  } else if(meta.status==="podium" && lastSeenStatus!=="podium"){
-    lastSeenStatus="podium";
-    renderPlayerPodium().then(function(){ show("screen-player-podium"); });
-  } else if(meta.status==="question" && document.getElementById("screen-player-question").classList.contains("active")){
+  } else if (meta.status === "reveal" && lastSeenStatus !== "reveal") {
+    lastSeenStatus = "reveal";
+    renderPlayerReveal().then(() => show("screen-player-reveal"));
+  } else if (meta.status === "podium" && lastSeenStatus !== "podium") {
+    lastSeenStatus = "podium";
+    renderPlayerPodium().then(() => show("screen-player-podium"));
+  } else if (meta.status === "question" && document.getElementById("screen-player-question").classList.contains("active")) {
     updatePlayerTimer();
   }
 }
 
-function renderPlayerQuestion(){
+function renderPlayerQuestion() {
   initAudio();
-  var qd = QUESTIONS[localMeta.qIndex];
-  document.getElementById("player-qcounter").textContent = "Pergunta "+(localMeta.qIndex+1)+" de "+QUESTIONS.length;
+  const qd = QUESTIONS[localMeta.qIndex];
+  document.getElementById("player-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + QUESTIONS.length;
   document.getElementById("player-qtext").textContent = qd.q;
-  document.getElementById("player-answer-status").textContent="";
+  document.getElementById("player-answer-status").textContent = "";
 
-  var streakBadge = document.getElementById("player-streak-badge");
-  var streakText = document.getElementById("player-streak-text");
-  if(myStreak >= 2) {
-    streakBadge.style.display = "flex";
-    streakText.textContent = "Serie x" + myStreak + " 🔥";
+  const streakBadge = document.getElementById("player-streak-badge");
+  const streakText = document.getElementById("player-streak-text");
+  if (myStreak >= 2) {
+    streakBadge.style.display = "inline-flex";
+    streakText.textContent = "Série x" + myStreak + " 🔥";
   } else {
     streakBadge.style.display = "none";
   }
 
-  var optsHtml = "";
-  for(var i=0;i<qd.opts.length;i++){
-    optsHtml += '<div class="opt o'+i+' clickable" id="player-opt-'+i+'" onclick="playerAnswer('+i+')"><span class="mk">'+OPT_MARK[i]+'</span><span>'+qd.opts[i]+'</span></div>';
+  let optsHtml = "";
+  for (let i = 0; i < qd.opts.length; i++) {
+    optsHtml += `<div class="opt o${i} clickable" id="player-opt-${i}" onclick="playerAnswer(${i})">
+      <span class="mk">${OPT_MARK[i]}</span>
+      <span>${qd.opts[i]}</span>
+    </div>`;
   }
   document.getElementById("player-opts").innerHTML = optsHtml;
   updatePlayerTimer();
   updatePlayerGap();
 }
 
-function updatePlayerTimer(){
-  if(!localMeta || localMeta.status!=="question") return;
-  var remain = Math.max(0, localMeta.duration - (Date.now()-localMeta.qStartAt));
-  var pct = Math.max(0,Math.min(100,(remain/localMeta.duration)*100));
-  var bar = document.getElementById("player-timerbar");
-  var lab = document.getElementById("player-timer");
-  if(bar) bar.style.width = pct+"%";
-  if(lab) lab.textContent = Math.ceil(remain/1000)+"s";
+function updatePlayerTimer() {
+  if (!localMeta || localMeta.status !== "question") return;
+  const remain = Math.max(0, localMeta.duration - (Date.now() - localMeta.qStartAt));
+  const pct = Math.max(0, Math.min(100, (remain / localMeta.duration) * 100));
+  const bar = document.getElementById("player-timerbar");
+  const lab = document.getElementById("player-timer");
+  if (bar) bar.style.width = pct + "%";
+  if (lab) lab.textContent = Math.ceil(remain / 1000) + "s";
 }
 
-async function updatePlayerGap(){
-  if(!code || !myPid) return;
-  var playersRef = dbRef(dbPath("broto", code, "players"));
-  var snap = playersRef ? await playersRef.get() : {val: function(){ return null; }};
-  var items = [];
-  var val = snap.val() || {};
-  for(var k in val) if(val[k]) items.push(val[k]);
-  items.sort(function(a,b){ return (b.score||0)-(a.score||0); });
+async function updatePlayerGap() {
+  if (!code || !myPid) return;
+  const playersRef = dbRef(dbPath("broto", code, "players"));
+  const snap = playersRef ? await playersRef.get() : { val: () => null };
+  const items = [];
+  const val = snap.val() || {};
+  for (const k in val) if (val[k]) items.push(val[k]);
+  items.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-  var myRank = -1, myScore = 0;
-  for(var i=0;i<items.length;i++){
-    if(items[i].pid === myPid) { myRank = i+1; myScore = items[i].score||0; }
+  let myRank = -1, myScore = 0;
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].pid === myPid) { myRank = i + 1; myScore = items[i].score || 0; }
   }
 
-  var gapEl = document.getElementById("player-gap-info");
-  var gapText = document.getElementById("player-gap-text");
+  const gapEl = document.getElementById("player-gap-info");
+  const gapText = document.getElementById("player-gap-text");
 
-  if(myRank > 1 && items[myRank-2]) {
-    var gap = (items[myRank-2].score||0) - myScore;
-    gapEl.style.display = "flex";
-    gapText.textContent = "Voce esta a " + gap + " pts do " + (myRank-1) + "o lugar";
-  } else if(myRank === 1 && items[1]) {
-    var lead = myScore - (items[1].score||0);
-    gapEl.style.display = "flex";
+  if (myRank > 1 && items[myRank - 2]) {
+    const gap = (items[myRank - 2].score || 0) - myScore;
+    gapEl.style.display = "inline-flex";
+    gapText.textContent = "Você está a " + gap + " pts do " + (myRank - 1) + "º lugar";
+  } else if (myRank === 1 && items[1]) {
+    const lead = myScore - (items[1].score || 0);
+    gapEl.style.display = "inline-flex";
     gapText.textContent = "Liderando por " + lead + " pts 🔥";
   } else {
     gapEl.style.display = "none";
   }
 }
 
-setInterval(function(){
-  if(role==="player" && document.getElementById("screen-player-question").classList.contains("active")) {
+setInterval(() => {
+  if (role === "player" && document.getElementById("screen-player-question").classList.contains("active")) {
     updatePlayerTimer();
     updatePlayerGap();
   }
 }, 250);
 
-async function playerAnswer(idx){
-  if(hasAnsweredThisQ) return;
+async function playerAnswer(idx) {
+  if (hasAnsweredThisQ) return;
   hasAnsweredThisQ = true;
-  var opts = document.querySelectorAll("#player-opts .opt");
-  for(var i=0;i<opts.length;i++){
-    opts[i].classList.remove("clickable");
-    if(i!==idx) opts[i].classList.add("dim");
-  }
-  document.getElementById("player-answer-status").textContent = "Resposta enviada - aguarde a revelacao!";
-  var ansRef = dbRef(dbPath("broto", code, "answers", localMeta.qIndex, myPid));
-  if(ansRef) await ansRef.set({pid:myPid, choice:idx, at:Date.now()});
+  const opts = document.querySelectorAll("#player-opts .opt");
+  opts.forEach((opt, i) => {
+    opt.classList.remove("clickable");
+    if (i !== idx) opt.classList.add("dim");
+  });
+  document.getElementById("player-answer-status").textContent = "Resposta enviada — aguarde a revelação!";
+  const ansRef = dbRef(dbPath("broto", code, "answers", localMeta.qIndex, myPid));
+  if (ansRef) await ansRef.set({ pid: myPid, choice: idx, at: Date.now() });
 }
 
-async function renderPlayerReveal(){
-  var qd = QUESTIONS[localMeta.qIndex];
-  var ansRef = dbRef(dbPath("broto", code, "answers", localMeta.qIndex, myPid));
-  var myAns = ansRef ? (await ansRef.get()).val() : null;
-  var pRef = dbRef(dbPath("broto", code, "players", myPid));
-  var p = pRef ? (await pRef.get()).val() : null;
-  var isCorrect = myAns && myAns.choice===qd.c;
+async function renderPlayerReveal() {
+  const qd = QUESTIONS[localMeta.qIndex];
+  const ansRef = dbRef(dbPath("broto", code, "answers", localMeta.qIndex, myPid));
+  const myAns = ansRef ? (await ansRef.get()).val() : null;
+  const pRef = dbRef(dbPath("broto", code, "players", myPid));
+  const p = pRef ? (await pRef.get()).val() : null;
+  const isCorrect = myAns && myAns.choice === qd.c;
 
-  if(isCorrect) {
+  if (isCorrect) {
     myStreak++;
     myBestStreak = Math.max(myBestStreak, myStreak);
     sfxStreak(myStreak);
@@ -973,107 +1279,130 @@ async function renderPlayerReveal(){
     myStreak = 0;
   }
 
-  var banner = document.getElementById("player-reveal-banner");
-  banner.className = "reveal-banner "+(isCorrect?"ok":"no");
-  if(!myAns) banner.textContent = "Tempo esgotado ⏳";
-  else if(isCorrect){ banner.textContent = "Certinho! 🌿"; sfxCorrect(); spawnConfetti(); }
-  else { banner.textContent = "Quase - nao foi dessa vez"; sfxWrong(); }
+  const banner = document.getElementById("player-reveal-banner");
+  banner.className = "reveal-banner " + (isCorrect ? "ok" : "no");
+  if (!myAns) {
+    banner.textContent = "Tempo esgotado ⏳";
+  } else if (isCorrect) {
+    banner.textContent = "Certinho! 🌿";
+    sfxCorrect();
+    spawnConfetti();
+  } else {
+    banner.textContent = "Quase — não foi dessa vez";
+    sfxWrong();
+  }
 
-  var pts = isCorrect ? calcPoints(myAns.at-localMeta.qStartAt, myStreak) : {base:0, bonus:0, total:0};
-  var ptsText = isCorrect ? ("+"+pts.total+" pontos" + (pts.bonus>0 ? " ("+pts.base+" + 🔥"+pts.bonus+")" : "")) : "";
+  const pts = isCorrect ? calcPoints(myAns.at - localMeta.qStartAt, myStreak) : { base: 0, bonus: 0, total: 0 };
+  const ptsText = isCorrect
+    ? ("+" + pts.total + " pontos" + (pts.bonus > 0 ? " (" + pts.base + " + 🔥" + pts.bonus + ")" : ""))
+    : "";
   document.getElementById("player-reveal-points").textContent = ptsText;
-  document.getElementById("player-reveal-total").textContent = "Pontuacao total: "+(p?p.score||0:0);
+  document.getElementById("player-reveal-total").textContent = "Pontuação total: " + (p ? p.score || 0 : 0);
 
-  var streakReveal = document.getElementById("player-streak-reveal");
-  var streakRevealText = document.getElementById("player-streak-reveal-text");
-  if(myStreak >= 2) {
+  const streakReveal = document.getElementById("player-streak-reveal");
+  const streakRevealText = document.getElementById("player-streak-reveal-text");
+  if (myStreak >= 2) {
     streakReveal.style.display = "flex";
-    streakRevealText.textContent = "Serie de " + myStreak + " acertos! 🔥";
+    streakRevealText.textContent = "Série de " + myStreak + " acertos! 🔥";
   } else {
     streakReveal.style.display = "none";
   }
 
-  var playersRef = dbRef(dbPath("broto", code, "players"));
-  var snap = playersRef ? await playersRef.get() : {val: function(){ return null; }};
-  var items = [];
-  var val = snap.val() || {};
-  for(var k in val) if(val[k]) items.push(val[k]);
-  items.sort(function(a,b){ return (b.score||0)-(a.score||0); });
+  const playersRef = dbRef(dbPath("broto", code, "players"));
+  const snap = playersRef ? await playersRef.get() : { val: () => null };
+  const items = [];
+  const val = snap.val() || {};
+  for (const k in val) if (val[k]) items.push(val[k]);
+  items.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-  var myRank = -1, myScore = 0;
-  for(var i=0;i<items.length;i++){
-    if(items[i].pid === myPid) { myRank = i+1; myScore = items[i].score||0; }
+  let myRank = -1, myScore = 0;
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].pid === myPid) { myRank = i + 1; myScore = items[i].score || 0; }
   }
 
-  var gapRevealEl = document.getElementById("player-gap-reveal");
-  var gapRevealText = document.getElementById("player-gap-reveal-text");
-  if(myRank > 1 && items[myRank-2]) {
-    var gap = (items[myRank-2].score||0) - myScore;
-    gapRevealEl.style.display = "flex";
-    gapRevealText.textContent = "Voce esta a " + gap + " pts do " + (myRank-1) + "o lugar";
-  } else if(myRank === 1 && items[1]) {
-    var lead = myScore - (items[1].score||0);
-    gapRevealEl.style.display = "flex";
+  const gapRevealEl = document.getElementById("player-gap-reveal");
+  const gapRevealText = document.getElementById("player-gap-reveal-text");
+  if (myRank > 1 && items[myRank - 2]) {
+    const gap = (items[myRank - 2].score || 0) - myScore;
+    gapRevealEl.style.display = "inline-flex";
+    gapRevealText.textContent = "Você está a " + gap + " pts do " + (myRank - 1) + "º lugar";
+  } else if (myRank === 1 && items[1]) {
+    const lead = myScore - (items[1].score || 0);
+    gapRevealEl.style.display = "inline-flex";
     gapRevealText.textContent = "Liderando por " + lead + " pts 🔥";
   } else {
     gapRevealEl.style.display = "none";
   }
 }
 
-async function renderPlayerPodium(){
-  var playersRef = dbRef(dbPath("broto", code, "players"));
-  var snap = playersRef ? await playersRef.get() : {val: function(){ return null; }};
-  var items = [];
-  var val = snap.val() || {};
-  for(var k in val) if(val[k]) items.push(val[k]);
-  items.sort(function(a,b){ return (b.score||0)-(a.score||0); });
+async function renderPlayerPodium() {
+  const playersRef = dbRef(dbPath("broto", code, "players"));
+  const snap = playersRef ? await playersRef.get() : { val: () => null };
+  const items = [];
+  const val = snap.val() || {};
+  for (const k in val) if (val[k]) items.push(val[k]);
+  items.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-  var myRank = -1;
-  for(var i=0;i<items.length;i++) if(items[i].pid===myPid) myRank = i+1;
-  var me = null;
-  for(var i=0;i<items.length;i++) if(items[i].pid===myPid) me = items[i];
+  let myRank = -1;
+  let me = null;
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].pid === myPid) {
+      myRank = i + 1;
+      me = items[i];
+    }
+  }
 
-  var emojis = ["🥇","🥈","🥉"];
-  document.getElementById("player-final-emoji").textContent = myRank<=3 && myRank>0 ? emojis[myRank-1] : "🌱";
-  document.getElementById("player-final-rank").textContent = (myRank>0?myRank:"?")+"o lugar de "+items.length;
-  document.getElementById("player-final-score").textContent = (me?me.score||0:0)+" pontos" + (me && me.bestStreak>2?" · 🔥 serie "+me.bestStreak:"");
+  const emojis = ["🥇", "🥈", "🥉"];
+  document.getElementById("player-final-emoji").textContent = myRank <= 3 && myRank > 0 ? emojis[myRank - 1] : "🌱";
+  document.getElementById("player-final-rank").textContent = (myRank > 0 ? myRank : "?") + "º lugar de " + items.length;
+  document.getElementById("player-final-score").textContent = (me ? me.score || 0 : 0) + " pontos" + (me && me.bestStreak > 2 ? " · 🔥 série " + me.bestStreak : "");
 
-  var listHtml = "";
-  for(var i=0;i<items.length;i++){
-    var p = items[i];
-    var isMe = p.pid===myPid;
-    var palette = p.avatarPalette || AVATAR_PALETTES[0];
-    var avUrl = generateAvatarSVG(palette, 28);
-    listHtml += '<div class="rank-row" style="animation-delay:'+(i*0.08)+'s'+(isMe?';border-color:var(--bloom);box-shadow:0 0 0 1px var(--bloom)':'')+'"><span class="rn">'+(i+1)+'</span><img src="'+avUrl+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt=""><span>'+escapeHtml(p.name)+'</span><span class="rs">'+(p.score||0)+' pts'+(p.bestStreak>2?' 🔥'+p.bestStreak:'')+'</span></div>';
+  let listHtml = "";
+  for (let i = 0; i < items.length; i++) {
+    const p = items[i];
+    const isMe = p.pid === myPid;
+    const avIdx = AVATAR_DATA.findIndex(d => d.name === p.avatar);
+    const avUrl = getAvatarUrl(avIdx >= 0 ? avIdx : 0, 28);
+    const highlight = isMe ? 'border-color:var(--bloom);box-shadow:0 0 0 1px var(--bloom)' : '';
+    listHtml += `<div class="rank-row" style="animation-delay:${i * 0.08}s;${highlight}">
+      <span class="rn">${i + 1}</span>
+      <img src="${avUrl}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt=""
+           onerror="this.src='${generateArtisticAvatar(AVATAR_DATA[0],28)}'">
+      <span>${escapeHtml(p.name)}</span>
+      <span class="rs">${p.score || 0} pts${p.bestStreak > 2 ? ' 🔥' + p.bestStreak : ''}</span>
+    </div>`;
   }
   document.getElementById("player-final-list").innerHTML = listHtml;
 
   show("screen-player-podium");
   startLeafFall();
-  if(myRank<=3 && myRank>0){ 
-    sfxWinner(); 
-    spawnConfetti(); 
+  if (myRank <= 3 && myRank > 0) {
+    sfxWinner();
     spawnConfetti();
+    setTimeout(spawnConfetti, 400);
   }
 }
 
 /* ============== BOOT ============== */
-(function boot(){
-  var params = new URLSearchParams(location.search);
-  var preCode = params.get("code");
-  if(preCode && /^\d{6}$/.test(preCode)){
-    role="player";
-    if(!initFirebase()) enableDemoMode();
-    (async function(){
-      var metaRef = dbRef(dbPath("broto", preCode, "meta"));
-      var snap = metaRef ? await metaRef.get() : {val: function(){ return null; }, exists: function(){ return false; }};
-      if(snap.exists()){
-        code = preCode; localMeta = snap.val();
+(function boot() {
+  const params = new URLSearchParams(location.search);
+  const preCode = params.get("code");
+  if (preCode && /^\d{6}$/.test(preCode)) {
+    role = "player";
+    if (!initFirebase()) enableDemoMode();
+    (async () => {
+      const metaRef = dbRef(dbPath("broto", preCode, "meta"));
+      const snap = metaRef ? await metaRef.get() : { val: () => null, exists: () => false };
+      if (snap.exists()) {
+        code = preCode;
+        localMeta = snap.val();
         buildAvatarGrid();
         show("screen-join-profile");
       } else {
         goLanding();
       }
     })();
+  } else {
+    goLanding();
   }
 })();

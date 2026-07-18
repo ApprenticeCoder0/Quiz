@@ -3,182 +3,338 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>BROTO - Quiz Coletivo - Etica Ambiental & Ecofeminismo</title>
+<meta name="theme-color" content="#0a1810">
+<meta name="description" content="BROTO - Quiz Coletivo sobre Ética Ambiental e Ecofeminismo">
+<title>BROTO - Quiz Coletivo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=4.0">
+<link rel="stylesheet" href="style.css?v=5.0">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-<div class="conn-status online" id="conn-status">- online</div>
+
+<!-- Ambient Background -->
+<div class="ambient-bg">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+  <div class="noise-overlay"></div>
+</div>
+
+<!-- Connection Status -->
+<div class="conn-status online" id="conn-status">
+  <span class="conn-dot"></span>
+  <span class="conn-text">online</span>
+</div>
+
 <div class="app" id="app">
 
-  <!-- LANDING -->
+  <!-- ═════════════════ LANDING ═════════════════ -->
   <div class="screen active" id="screen-landing">
-    <div class="landing-bg">
-      <div class="landing-particle p1"></div>
-      <div class="landing-particle p2"></div>
-      <div class="landing-particle p3"></div>
-      <div class="landing-particle p4"></div>
-      <div class="landing-particle p5"></div>
+    <div class="landing-content">
+      <div class="eyebrow" data-text="Quiz Coletivo">Quiz Coletivo</div>
+
+      <div class="wordmark-wrapper">
+        <div class="wordmark">
+          <span class="leaf-icon">🌱</span>
+          <span class="wordmark-text">BROTO</span>
+        </div>
+        <div class="wordmark-underline"></div>
+      </div>
+
+      <p class="subtitle">Cada resposta certa é uma raiz a mais.<br>Junte a turma e faça esse tema florescer.</p>
+
+      <div class="topic-pills">
+        <span class="pill">Ética Ambiental</span>
+        <span class="pill pill--accent">Ecofeminismo</span>
+        <span class="pill">Justiça Climática</span>
+      </div>
+
+      <div class="stack">
+        <button class="btn btn-primary btn-landing" onclick="goHostSetup()">
+          <span class="btn-icon">🖥️</span>
+          <span class="btn-text">Sou apresentador(a)</span>
+          <span class="btn-shine"></span>
+        </button>
+        <button class="btn btn-secondary btn-landing" onclick="goJoinCode()">
+          <span class="btn-icon">🌿</span>
+          <span class="btn-text">Entrar com código</span>
+        </button>
+      </div>
+
+      <div class="landing-features">
+        <div class="feat" data-delay="0">
+          <div class="feat-ring">⚡</div>
+          <span class="feat-text">20 perguntas</span>
+        </div>
+        <div class="feat" data-delay="1">
+          <div class="feat-ring">🔥</div>
+          <span class="feat-text">Série de acertos</span>
+        </div>
+        <div class="feat" data-delay="2">
+          <div class="feat-ring">🏆</div>
+          <span class="feat-text">Pontuação por velocidade</span>
+        </div>
+        <div class="feat" data-delay="3">
+          <div class="feat-ring">📊</div>
+          <span class="feat-text">Pódio ao vivo</span>
+        </div>
+      </div>
     </div>
-    <div class="eyebrow">Quiz coletivo - Etica Ambiental & Ecofeminismo</div>
-    <div class="wordmark"><span class="leaf-o">🌱</span>BROTO</div>
-    <p class="subtitle">Cada resposta certa e uma raiz a mais. Junte a turma numa sala e facam esse tema crescer juntos.</p>
-    <div class="stack">
-      <button class="btn btn-primary" onclick="goHostSetup()">🖥️ Sou apresentador(a) - abrir sala</button>
-      <button class="btn btn-secondary" onclick="goJoinCode()">🌿 Entrar com codigo</button>
-    </div>
-    <div class="landing-features">
-      <div class="feat"><span class="feat-icon">⚡</span><span class="feat-text">20 perguntas</span></div>
-      <div class="feat"><span class="feat-icon">🔥</span><span class="feat-text">Serie de acertos</span></div>
-      <div class="feat"><span class="feat-icon">🏆</span><span class="feat-text">Pontuacao por velocidade</span></div>
-      <div class="feat"><span class="feat-icon">📊</span><span class="feat-text">Podio ao vivo</span></div>
-    </div>
-    <div class="foot">v4.0 - BROTO Quiz</div>
+
+    <div class="floating-leaves" id="floating-leaves"></div>
+    <div class="foot">BROTO v5.0 — Quiz Coletivo</div>
   </div>
 
-  <!-- HOST: creating -->
+  <!-- ═════════════════ HOST: SETUP ═════════════════ -->
   <div class="screen" id="screen-host-setup">
-    <div class="eyebrow">Apresentador</div>
-    <h2 style="font-size:26px;text-align:center;">Abrindo sua sala...</h2>
-    <p class="subtitle">Conectando ao jardim digital</p>
-    <div class="loading-dots"><span></span><span></span><span></span></div>
+    <div class="setup-card">
+      <div class="spinner-art">
+        <div class="spinner-leaf">🌱</div>
+        <div class="spinner-ring"></div>
+      </div>
+      <h2>Abrindo sua sala...</h2>
+      <p class="subtitle">Preparando o jardim digital</p>
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+    </div>
   </div>
 
-  <!-- HOST: lobby -->
+  <!-- ═════════════════ HOST: LOBBY ═════════════════ -->
   <div class="screen" id="screen-host-lobby">
-    <div class="eyebrow">Projete esta tela</div>
-    <h2 style="font-size:20px;">Entrem pelo celular em</h2>
-    <div class="code-plate" id="host-code">------</div>
-    <div class="qr-wrap"><div id="qr-box"></div></div>
-    <div class="lobby-grid" id="host-players"></div>
-    <div class="count-pill" id="host-count">0 pessoas na sala</div>
+    <div class="lobby-header">
+      <div class="eyebrow">Projete esta tela</div>
+      <h2>Entrem pelo celular</h2>
+    </div>
+
+    <div class="code-showcase">
+      <div class="code-plate" id="host-code">------</div>
+      <div class="code-label">código da sala</div>
+    </div>
+
+    <div class="qr-showcase">
+      <div class="qr-wrap"><div id="qr-box"></div></div>
+      <div class="qr-url" id="qr-url"></div>
+    </div>
+
+    <div class="lobby-players-area">
+      <div class="lobby-grid" id="host-players"></div>
+      <div class="count-pill" id="host-count">
+        <span class="count-icon">👥</span>
+        <span id="host-count-text">0 pessoas na sala</span>
+      </div>
+    </div>
+
     <div class="host-controls">
-      <button class="btn btn-primary" id="btn-start-game" onclick="hostStartGame()" disabled>🌻 Iniciar quiz</button>
+      <button class="btn btn-primary btn-large" id="btn-start-game" onclick="hostStartGame()" disabled>
+        <span>🌻</span> Iniciar Quiz
+      </button>
     </div>
   </div>
 
-  <!-- HOST: question / reveal -->
+  <!-- ═════════════════ HOST: GAME ═════════════════ -->
   <div class="screen" id="screen-host-game">
-    <div class="host-top">
-      <span class="q-counter" id="host-qcounter">Pergunta 1 de 20</span>
-      <span class="q-counter" id="host-answered">0 respostas</span>
+    <div class="game-header">
+      <div class="host-top">
+        <span class="q-counter" id="host-qcounter">Pergunta 1 de 20</span>
+        <span class="q-counter q-counter--answers" id="host-answered">0 respostas</span>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-track"></div>
+        <div class="timer-bar" id="host-timerbar"></div>
+        <div class="timer-glow" id="host-timer-glow"></div>
+      </div>
     </div>
-    <div class="timer-wrap"><div class="timer-bar" id="host-timerbar"></div></div>
-    <div class="question-box"><h2 id="host-qtext">-</h2></div>
-    <div class="opts-grid" id="host-opts"></div>
+
+    <div class="question-box">
+      <div class="question-number">#<span id="host-qnum">1</span></div>
+      <h2 id="host-qtext">-</h2>
+    </div>
+
+    <div class="opts-grid opts-grid--host" id="host-opts"></div>
+
     <div class="host-controls">
-      <button class="btn btn-gold" id="btn-reveal" onclick="hostReveal()">🔎 Revelar resposta</button>
-      <button class="btn btn-primary" id="btn-next" style="display:none;" onclick="hostNext()">Proxima →</button>
+      <button class="btn btn-gold" id="btn-reveal" onclick="hostReveal()">
+        <span>🔎</span> Revelar Resposta
+      </button>
+      <button class="btn btn-primary" id="btn-next" style="display:none;" onclick="hostNext()">
+        <span id="btn-next-text">Próxima →</span>
+      </button>
     </div>
+
     <div class="live-podium" id="live-podium" style="display:none;">
-      <div class="live-podium-title">🏆 Podio ao vivo</div>
+      <div class="live-podium-header">
+        <span class="live-podium-icon">🏆</span>
+        <span class="live-podium-title">Pódio ao Vivo</span>
+      </div>
       <div id="live-podium-content"></div>
     </div>
   </div>
 
-  <!-- HOST: final podium -->
+  <!-- ═════════════════ HOST: PODIUM ═════════════════ -->
   <div class="screen" id="screen-host-podium">
-    <div class="eyebrow">Resultado final</div>
-    <h1 style="font-size:clamp(28px,6vw,48px);text-align:center;margin-bottom:6px;">O jardim floresceu 🌸</h1>
-    <p class="subtitle" style="margin-top:0; margin-bottom:18px;">Revelando do ultimo ao primeiro lugar...</p>
+    <div class="podium-header">
+      <div class="eyebrow">Resultado Final</div>
+      <h1>O jardim floresceu 🌸</h1>
+      <p class="subtitle">Revelando do último ao primeiro lugar...</p>
+    </div>
+
     <div class="podium-stage" id="host-podium"></div>
     <div class="rank-list" id="host-ranklist"></div>
-    <button class="btn btn-ghost" onclick="location.reload()" style="margin-top:22px;">Encerrar e voltar ao inicio</button>
+
+    <button class="btn btn-ghost" onclick="location.reload()" style="margin-top:22px;">
+      ↻ Encerrar e voltar ao início
+    </button>
   </div>
 
-  <!-- JOIN: code entry -->
+  <!-- ═════════════════ JOIN: CODE ═════════════════ -->
   <div class="screen" id="screen-join-code">
-    <div class="eyebrow">Entrar na sala</div>
-    <h2 style="font-size:24px;">Digite o codigo do quiz</h2>
-    <div class="card" style="max-width:360px; margin-top:20px;">
-      <input type="text" id="join-code-input" maxlength="6" placeholder="000000" inputmode="numeric">
+    <div class="join-card">
+      <div class="eyebrow">Entrar na Sala</div>
+      <h2>Digite o código</h2>
+      <p class="subtitle">Pergunte para quem está apresentando</p>
+
+      <div class="code-input-wrap">
+        <input type="text" id="join-code-input" maxlength="6" placeholder="000000" inputmode="numeric" autocomplete="off">
+        <div class="code-input-underline"></div>
+      </div>
+
       <div class="error-text" id="join-code-error"></div>
-      <button class="btn btn-primary" style="width:100%; margin-top:14px;" onclick="submitCode()">Continuar →</button>
+
+      <button class="btn btn-primary" style="width:100%; margin-top:18px;" onclick="submitCode()">
+        Continuar →
+      </button>
+      <button class="btn btn-ghost" onclick="goLanding()" style="margin-top:12px;">
+        ← voltar
+      </button>
     </div>
-    <button class="btn btn-ghost" onclick="goLanding()" style="margin-top:16px;">← voltar</button>
   </div>
 
-  <!-- JOIN: profile -->
+  <!-- ═════════════════ JOIN: PROFILE ═════════════════ -->
   <div class="screen" id="screen-join-profile">
-    <div class="eyebrow">Sua identidade na sala</div>
-    <h2 style="font-size:22px;">Como querem te chamar?</h2>
-    <div class="card" style="max-width:440px; margin-top:18px;">
-      <input type="text" class="name-input" id="join-name-input" maxlength="18" placeholder="Seu nome ou apelido" oninput="checkNameFilter()">
-      <div class="filter-warning" id="name-filter-warning">
-        <span>⚠️</span> Esse nome contem termos improprios. Escolha outro, por favor.
+    <div class="join-card" style="max-width:480px;">
+      <div class="eyebrow">Sua Identidade</div>
+      <h2>Como querem te chamar?</h2>
+
+      <div class="name-input-wrap">
+        <input type="text" class="name-input" id="join-name-input" maxlength="18" placeholder="Seu nome ou apelido" oninput="checkNameFilter()" autocomplete="off">
+        <div class="name-input-underline"></div>
       </div>
-      <div style="margin-top:14px; margin-bottom:2px; font-size:12px; color:var(--cream-dim); font-weight:500;">Escolha seu personagem:</div>
-      <div class="avatar-grid" id="avatar-grid"></div>
-      <button class="btn btn-primary" style="width:100%; margin-top:6px;" onclick="playerJoinRoom()" id="btn-join-room">Entrar na sala 🌱</button>
+
+      <div class="filter-warning" id="name-filter-warning">
+        <span class="filter-icon">⚠️</span>
+        <span>Esse nome contém termos impróprios. Escolha outro, por favor.</span>
+      </div>
+
+      <div class="avatar-section">
+        <div class="avatar-label">Escolha seu personagem:</div>
+        <div class="avatar-grid" id="avatar-grid"></div>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%; margin-top:8px;" onclick="playerJoinRoom()" id="btn-join-room">
+        <span>🌱</span> Entrar na Sala
+      </button>
       <div class="error-text" id="join-profile-error"></div>
     </div>
   </div>
 
-  <!-- PLAYER: waiting lobby -->
+  <!-- ═════════════════ PLAYER: WAITING ═════════════════ -->
   <div class="screen" id="screen-player-wait">
-    <div class="eyebrow"><span class="pulse-dot"></span>Voce esta dentro</div>
     <div class="player-wait-card">
-      <img src="" alt="" class="wait-av" id="player-wait-av-img">
+      <div class="wait-status">
+        <span class="pulse-dot"></span>
+        <span>Você está dentro!</span>
+      </div>
+
+      <div class="wait-avatar-wrap">
+        <img src="" alt="" class="wait-av" id="player-wait-av-img">
+        <div class="wait-avatar-ring"></div>
+      </div>
+
       <div class="wait-name" id="player-wait-name">-</div>
       <div class="wait-hint">Aguarde a pessoa apresentadora iniciar o quiz na tela projetada.</div>
-      <div class="code-tag" style="margin-top:14px; display:inline-block;" id="player-wait-code">sala ------</div>
+      <div class="code-tag" id="player-wait-code">sala ------</div>
     </div>
   </div>
 
-  <!-- PLAYER: question -->
+  <!-- ═════════════════ PLAYER: QUESTION ═════════════════ -->
   <div class="screen" id="screen-player-question">
-    <div class="host-top">
-      <span class="q-counter" id="player-qcounter">Pergunta 1</span>
-      <span class="q-counter" id="player-timer">20s</span>
+    <div class="game-header">
+      <div class="host-top">
+        <span class="q-counter" id="player-qcounter">Pergunta 1</span>
+        <span class="q-counter q-counter--timer" id="player-timer">20s</span>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-track"></div>
+        <div class="timer-bar timer-bar--player" id="player-timerbar"></div>
+      </div>
     </div>
-    <div class="timer-wrap"><div class="timer-bar" id="player-timerbar"></div></div>
+
     <div class="streak-badge" id="player-streak-badge" style="display:none;">
       <span class="streak-flame">🔥</span>
-      <span class="streak-text" id="player-streak-text">Serie x2</span>
+      <span class="streak-text" id="player-streak-text">Série x2</span>
     </div>
-    <p class="subtitle" style="margin-top:0; font-size:clamp(15px,2.4vw,19px);" id="player-qtext">-</p>
-    <div class="opts-grid" id="player-opts"></div>
+
+    <div class="question-box question-box--player">
+      <h2 id="player-qtext">-</h2>
+    </div>
+
+    <div class="opts-grid opts-grid--player" id="player-opts"></div>
+
     <div class="error-text" id="player-answer-status"></div>
+
     <div class="gap-info" id="player-gap-info" style="display:none;">
       <span class="gap-icon">📊</span>
-      <span class="gap-text" id="player-gap-text">Voce esta a 120 pts do 1o lugar</span>
+      <span class="gap-text" id="player-gap-text">-</span>
     </div>
   </div>
 
-  <!-- PLAYER: reveal -->
+  <!-- ═════════════════ PLAYER: REVEAL ═════════════════ -->
   <div class="screen" id="screen-player-reveal">
-    <div class="reveal-banner" id="player-reveal-banner">-</div>
-    <div class="points-line" id="player-reveal-points"></div>
-    <div class="streak-reveal" id="player-streak-reveal" style="display:none;">
-      <span class="streak-flame">🔥</span>
-      <span id="player-streak-reveal-text">Serie de 3 acertos!</span>
-    </div>
-    <div class="score-badge" id="player-reveal-total"></div>
-    <div class="gap-info-reveal" id="player-gap-reveal" style="display:none;">
-      <span class="gap-icon">📊</span>
-      <span class="gap-text" id="player-gap-reveal-text">Voce esta a 120 pts do 1o lugar</span>
+    <div class="reveal-card">
+      <div class="reveal-banner" id="player-reveal-banner">-</div>
+
+      <div class="reveal-details">
+        <div class="points-line" id="player-reveal-points"></div>
+
+        <div class="streak-reveal" id="player-streak-reveal" style="display:none;">
+          <span class="streak-flame">🔥</span>
+          <span id="player-streak-reveal-text">Série de 3 acertos!</span>
+        </div>
+
+        <div class="score-badge" id="player-reveal-total"></div>
+
+        <div class="gap-info-reveal" id="player-gap-reveal" style="display:none;">
+          <span class="gap-icon">📊</span>
+          <span class="gap-text" id="player-gap-reveal-text">-</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- PLAYER: podium -->
+  <!-- ═════════════════ PLAYER: PODIUM ═════════════════ -->
   <div class="screen" id="screen-player-podium">
-    <div class="eyebrow">Fim de jogo</div>
-    <div style="font-size:48px; margin:10px 0; filter:drop-shadow(0 3px 10px rgba(0,0,0,0.25));" id="player-final-emoji">🌼</div>
-    <h1 style="font-size:clamp(26px,6vw,40px); text-align:center;" id="player-final-rank">-</h1>
-    <div class="score-badge" id="player-final-score" style="font-size:20px; margin:6px 0 18px;"></div>
+    <div class="player-podium-header">
+      <div class="eyebrow">Fim de Jogo</div>
+      <div class="final-emoji" id="player-final-emoji">🌼</div>
+      <h1 id="player-final-rank">-</h1>
+      <div class="score-badge score-badge--large" id="player-final-score"></div>
+    </div>
     <div class="rank-list" id="player-final-list"></div>
   </div>
 
 </div>
 
-<div class="demo-badge" id="demo-badge" onclick="toggleDemoMode()" style="display:none;">🧪 Modo Demo</div>
+<!-- Demo Badge -->
+<div class="demo-badge" id="demo-badge" onclick="toggleDemoMode()" style="display:none;">
+  <span>🧪</span> Modo Demo
+</div>
 
+<!-- Scripts -->
 <script src="questions.js"></script>
-<script src="app.js?v=4.0"></script>
+<script src="app.js?v=5.0"></script>
 </body>
 </html>
