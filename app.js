@@ -1,6 +1,6 @@
 /* ============================================================
-   BROTO v5.0 — Quiz Coletivo: Ética Ambiental & Ecofeminismo
-   Design Premium · Avatares Artísticos · Animações Fluidas
+   BROTO v5.1 — Quiz Coletivo: Ética Ambiental & Ecofeminismo
+   Avatares com rosto (DiceBear Notionists) + Fallback SVG
    ============================================================ */
 
 /* ============== FIREBASE CONFIG ============== */
@@ -14,85 +14,54 @@ const firebaseConfig = {
   appId: "1:379059171454:web:8574b77f5ec7eec8dbe82f"
 };
 
-/* ============== AVATARES ARTÍSTICOS SVG ==============
-   Cada avatar tem um SVG único gerado com gradientes,
-   padrões geométricos e iniciais elegantes.
-   As fotos da Wikimedia são mantidas como tentativa,
-   mas o SVG garante que nunca haverá imagem quebrada.
+/* ============== AVATARES COM ROSTO ==============
+   Usamos DiceBear Notionists — gera ilustrações de rosto
+   únicas e consistentes por seed. Serviço estável, gratuito.
+   Fallback SVG artístico garantido via onerror.
    ==================================================== */
 const AVATAR_DATA = [
-  {name:"Chico Mendes", initials:"CM", icon:"🌳",
-   grad:["#2d5a3d","#5a9e6e"], pattern:"circles",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Chico_Mendes.jpg/220px-Chico_Mendes.jpg"},
-  {name:"Vandana Shiva", initials:"VS", icon:"🌾",
-   grad:["#5a3d2d","#9e7a5a"], pattern:"dots",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Vandana_Shiva.jpg/220px-Vandana_Shiva.jpg"},
-  {name:"Greta Thunberg", initials:"GT", icon:"🌍",
-   grad:["#2d3d5a","#5a7a9e"], pattern:"lines",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Greta_Thunberg_01.jpg/220px-Greta_Thunberg_01.jpg"},
-  {name:"Marina Silva", initials:"MS", icon:"🌿",
-   grad:["#3d5a2d","#6e9e5a"], pattern:"circles",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Marina_Silva.jpg/220px-Marina_Silva.jpg"},
-  {name:"David Attenborough", initials:"DA", icon:"🦎",
-   grad:["#3d2d5a","#7a5a9e"], pattern:"dots",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/David_Attenborough.jpg/220px-David_Attenborough.jpg"},
-  {name:"Wangari Maathai", initials:"WM", icon:"🌳",
-   grad:["#5a5a2d","#9e9e5a"], pattern:"lines",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Wangari_Maathai.jpg/220px-Wangari_Maathai.jpg"},
-  {name:"Jane Goodall", initials:"JG", icon:"🐒",
-   grad:["#2d5a5a","#5a9e9e"], pattern:"circles",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Jane_Goodall.jpg/220px-Jane_Goodall.jpg"},
-  {name:"Leonardo DiCaprio", initials:"LD", icon:"🎬",
-   grad:["#1a3a2a","#4a7a5a"], pattern:"dots",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Leonardo_Dicaprio_Cannes_2019.jpg/220px-Leonardo_Dicaprio_Cannes_2019.jpg"},
-  {name:"Rachel Carson", initials:"RC", icon:"📖",
-   grad:["#3a1a2a","#7a4a5a"], pattern:"lines",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Rachel-Carson.jpg/220px-Rachel-Carson.jpg"},
-  {name:"Françoise d'Eaubonne", initials:"FE", icon:"♀️",
-   grad:["#2a3a1a","#5a7a4a"], pattern:"circles",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Fran%C3%A7oise_d%27Eaubonne.jpg/220px-Fran%C3%A7oise_d%27Eaubonne.jpg"},
-  {name:"Donna Haraway", initials:"DH", icon:"🐕",
-   grad:["#1a2a3a","#4a5a7a"], pattern:"dots",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Donna_Haraway.jpg/220px-Donna_Haraway.jpg"},
-  {name:"Val Plumwood", initials:"VP", icon:"🌲",
-   grad:["#3a2a1a","#7a5a4a"], pattern:"lines",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Val_Plumwood.jpg/220px-Val_Plumwood.jpg"},
-  {name:"Carolyn Merchant", initials:"CM2", icon:"📚",
-   grad:["#2a1a3a","#5a4a7a"], pattern:"circles",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Carolyn_Merchant.jpg/220px-Carolyn_Merchant.jpg"},
-  {name:"Severn Cullis-Suzuki", initials:"SS", icon:"🎤",
-   grad:["#1a3a3a","#4a7a7a"], pattern:"dots",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Severn_Cullis-Suzuki.jpg/220px-Severn_Cullis-Suzuki.jpg"},
-  {name:"Xiuhtezcatl Martinez", initials:"XM", icon:"🌵",
-   grad:["#3a3a1a","#7a7a4a"], pattern:"lines",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Xiuhtezcatl_Martinez.jpg/220px-Xiuhtezcatl_Martinez.jpg"}
+  {name:"Chico Mendes", seed:"chico-mendes", icon:"🌳",
+   grad:["#2d5a3d","#5a9e6e"]},
+  {name:"Vandana Shiva", seed:"vandana-shiva", icon:"🌾",
+   grad:["#5a3d2d","#9e7a5a"]},
+  {name:"Greta Thunberg", seed:"greta-thunberg", icon:"🌍",
+   grad:["#2d3d5a","#5a7a9e"]},
+  {name:"Marina Silva", seed:"marina-silva", icon:"🌿",
+   grad:["#3d5a2d","#6e9e5a"]},
+  {name:"David Attenborough", seed:"david-attenborough", icon:"🦎",
+   grad:["#3d2d5a","#7a5a9e"]},
+  {name:"Wangari Maathai", seed:"wangari-maathai", icon:"🌳",
+   grad:["#5a5a2d","#9e9e5a"]},
+  {name:"Jane Goodall", seed:"jane-goodall", icon:"🐒",
+   grad:["#2d5a5a","#5a9e9e"]},
+  {name:"Leonardo DiCaprio", seed:"leonardo-dicaprio", icon:"🎬",
+   grad:["#1a3a2a","#4a7a5a"]},
+  {name:"Rachel Carson", seed:"rachel-carson", icon:"📖",
+   grad:["#3a1a2a","#7a4a5a"]},
+  {name:"Françoise d'Eaubonne", seed:"francoise-eaubonne", icon:"♀️",
+   grad:["#2a3a1a","#5a7a4a"]},
+  {name:"Donna Haraway", seed:"donna-haraway", icon:"🐕",
+   grad:["#1a2a3a","#4a5a7a"]},
+  {name:"Val Plumwood", seed:"val-plumwood", icon:"🌲",
+   grad:["#3a2a1a","#7a5a4a"]},
+  {name:"Carolyn Merchant", seed:"carolyn-merchant", icon:"📚",
+   grad:["#2a1a3a","#5a4a7a"]},
+  {name:"Severn Cullis-Suzuki", seed:"severn-cullis-suzuki", icon:"🎤",
+   grad:["#1a3a3a","#4a7a7a"]},
+  {name:"Xiuhtezcatl Martinez", seed:"xiuhtezcatl-martinez", icon:"🌵",
+   grad:["#3a3a1a","#7a7a4a"]}
 ];
+
+function getDiceBearUrl(seed, size) {
+  size = size || 120;
+  // DiceBear Notionists — ilustrações de rosto elegantes e únicas
+  return `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(seed)}&size=${size}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+}
 
 function generateArtisticAvatar(data, size) {
   size = size || 120;
   const s = size;
   const id = 'av-' + Math.random().toString(36).slice(2, 8);
-
-  // Pattern definitions
-  let patternSVG = '';
-  if (data.pattern === 'circles') {
-    patternSVG = '<circle cx="25" cy="25" r="15" fill="rgba(255,255,255,0.04)"/>' +
-                 '<circle cx="75" cy="75" r="20" fill="rgba(255,255,255,0.03)"/>' +
-                 '<circle cx="75" cy="25" r="10" fill="rgba(255,255,255,0.05)"/>' +
-                 '<circle cx="25" cy="75" r="12" fill="rgba(255,255,255,0.04)"/>';
-  } else if (data.pattern === 'dots') {
-    for (let r = 0; r < 5; r++) {
-      for (let c = 0; c < 5; c++) {
-        patternSVG += `<circle cx="${10 + c*20}" cy="${10 + r*20}" r="2" fill="rgba(255,255,255,0.06)"/>`;
-      }
-    }
-  } else {
-    patternSVG = '<line x1="0" y1="30" x2="100" y2="30" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>' +
-                 '<line x1="0" y1="50" x2="100" y2="50" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>' +
-                 '<line x1="0" y1="70" x2="100" y2="70" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>' +
-                 '<line x1="30" y1="0" x2="30" y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>' +
-                 '<line x1="70" y1="0" x2="70" y2="100" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>';
-  }
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 100 100">
     <defs>
@@ -103,16 +72,11 @@ function generateArtisticAvatar(data, size) {
       <filter id="${id}-s">
         <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.35)"/>
       </filter>
-      <filter id="${id}-glow">
-        <feGaussianBlur stdDeviation="2" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
     </defs>
     <circle cx="50" cy="50" r="48" fill="url(#${id}-g)" stroke="rgba(240,234,214,0.15)" stroke-width="1.5"/>
-    <g opacity="0.6">${patternSVG}</g>
     <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
-    <text x="50" y="48" text-anchor="middle" font-family="Georgia,serif" font-size="24" font-weight="700" fill="#f2ead4" filter="url(#${id}-s)">${data.initials}</text>
-    <text x="50" y="72" text-anchor="middle" font-size="16" filter="url(#${id}-glow)">${data.icon}</text>
+    <text x="50" y="48" text-anchor="middle" font-family="Georgia,serif" font-size="24" font-weight="700" fill="#f2ead4" filter="url(#${id}-s)">${data.name.split(' ').map(n=>n[0]).join('')}</text>
+    <text x="50" y="72" text-anchor="middle" font-size="16">${data.icon}</text>
   </svg>`;
 
   return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
@@ -120,20 +84,19 @@ function generateArtisticAvatar(data, size) {
 
 function getAvatarUrl(index, size) {
   const data = AVATAR_DATA[index % AVATAR_DATA.length];
-  // Always return the artistic SVG as primary - photos are bonus
-  return generateArtisticAvatar(data, size);
+  return getDiceBearUrl(data.seed, size);
 }
 
-// For photo attempts (with automatic fallback)
-function getPhotoUrl(index) {
+function getFallbackAvatar(index, size) {
   const data = AVATAR_DATA[index % AVATAR_DATA.length];
-  return data.photo || null;
+  return generateArtisticAvatar(data, size);
 }
 
 const AVATARS = AVATAR_DATA.map((data, i) => ({
   name: data.name,
   url: getAvatarUrl(i, 120),
-  photo: getPhotoUrl(i),
+  fallback: getFallbackAvatar(i, 120),
+  seed: data.seed,
   palette: data
 }));
 
@@ -220,7 +183,7 @@ function normalizeLeet(text) {
     ['2','z'],['%','z']
   ];
   replacements.forEach(([from, to]) => {
-    const regex = new RegExp(from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+    const regex = new RegExp(from.replace(/[.*+?^${}()|[\]\]/g, '\$&'), 'g');
     result = result.replace(regex, to);
   });
   return result;
@@ -243,7 +206,7 @@ function containsBadWord(name) {
     if (noSpaces.indexOf(wordNoSpace) !== -1) return true;
   }
 
-  if (/(.)(\1){5,}/.test(lower)) return true;
+  if (/(.)(){5,}/.test(lower)) return true;
   if (/^\d+$/.test(lower)) return true;
 
   return false;
@@ -493,7 +456,6 @@ function show(id) {
   screens.forEach(s => s.classList.remove("active"));
   const el = document.getElementById(id);
   if (el) {
-    // Small delay for transition
     requestAnimationFrame(() => {
       el.classList.add("active");
     });
@@ -730,12 +692,14 @@ function renderLobbyPlayers() {
   let html = "";
   for (let i = 0; i < list.length; i++) {
     const p = list[i];
-    const palette = p.avatarPalette || AVATAR_DATA[0];
-    const avUrl = getAvatarUrl(AVATAR_DATA.findIndex(d => d.name === p.avatar) || 0, 80);
+    const avIdx = AVATAR_DATA.findIndex(d => d.name === p.avatar);
+    const safeIdx = avIdx >= 0 ? avIdx : 0;
+    const avUrl = getAvatarUrl(safeIdx, 80);
+    const fallback = getFallbackAvatar(safeIdx, 80);
     html += `<div class="sprout" style="animation-delay:${i * 0.05}s">
       <img class="av" src="${avUrl}" alt="${escapeHtml(p.name)}" 
            style="border-radius:50%;width:40px;height:40px;object-fit:cover;"
-           onerror="this.src='${generateArtisticAvatar(AVATAR_DATA[0],80)}'">
+           onerror="this.src='${fallback}'">
       <div class="nm">${escapeHtml(p.name)}</div>
     </div>`;
   }
@@ -850,7 +814,6 @@ async function hostReveal() {
       <div class="bar-label">${pct}%</div>`;
   }
 
-  // Update scores
   for (const key in answers) {
     const a = answers[key];
     if (!a || !a.pid) continue;
@@ -919,12 +882,14 @@ async function updateLivePodium() {
     const isLeader = i === 0;
     const pct = ((p.score || 0) / maxScore) * 100;
     const avIdx = AVATAR_DATA.findIndex(d => d.name === p.avatar);
-    const avUrl = getAvatarUrl(avIdx >= 0 ? avIdx : 0, 36);
+    const safeIdx = avIdx >= 0 ? avIdx : 0;
+    const avUrl = getAvatarUrl(safeIdx, 36);
+    const fallback = getFallbackAvatar(safeIdx, 36);
     html += `<div class="live-podium-row ${isLeader ? 'leader' : ''}">
       <span class="lp-rank">#${i + 1}</span>
       <img class="lp-av" src="${avUrl}" alt="" 
            style="border-radius:50%;width:28px;height:28px;object-fit:cover;"
-           onerror="this.src='${generateArtisticAvatar(AVATAR_DATA[0],36)}'">
+           onerror="this.src='${fallback}'">
       <span class="lp-name">${escapeHtml(p.name)}</span>
       <span class="lp-score">${p.score || 0} pts</span>
       <div class="lp-bar" style="width:${pct}%"></div>
@@ -962,7 +927,9 @@ async function renderHostPodium() {
     const medal = isTop3 ? medals[idx] : "";
     const flower = isTop3 ? flowers[idx] : "🌱";
     const avIdx = AVATAR_DATA.findIndex(d => d.name === p.avatar);
-    const avUrl = getAvatarUrl(avIdx >= 0 ? avIdx : 0, 56);
+    const safeIdx = avIdx >= 0 ? avIdx : 0;
+    const avUrl = getAvatarUrl(safeIdx, 56);
+    const fallback = getFallbackAvatar(safeIdx, 56);
     const topClass = isTop3 ? (idx === 0 ? "top-1" : idx === 1 ? "top-2" : "top-3") : "";
 
     const step = document.createElement("div");
@@ -972,7 +939,7 @@ async function renderHostPodium() {
       <div class="step-rank">#${rank}</div>
       <img class="step-av" src="${avUrl}" alt="${escapeHtml(p.name)}" 
            style="border-radius:50%;width:52px;height:52px;object-fit:cover;"
-           onerror="this.src='${generateArtisticAvatar(AVATAR_DATA[0],56)}'">
+           onerror="this.src='${fallback}'">
       <div class="step-info">
         <div class="step-name">${escapeHtml(p.name)}</div>
         <div class="step-score">${p.score || 0} pontos${p.bestStreak > 2 ? ' · 🔥 série ' + p.bestStreak : ''}</div>
@@ -989,11 +956,13 @@ async function renderHostPodium() {
   for (let i = 0; i < items.length; i++) {
     const p = items[i];
     const avIdx = AVATAR_DATA.findIndex(d => d.name === p.avatar);
-    const avUrl = getAvatarUrl(avIdx >= 0 ? avIdx : 0, 28);
+    const safeIdx = avIdx >= 0 ? avIdx : 0;
+    const avUrl = getAvatarUrl(safeIdx, 28);
+    const fallback = getFallbackAvatar(safeIdx, 28);
     rlHtml += `<div class="rank-row" style="animation-delay:${i * 0.08}s">
       <span class="rn">${i + 1}</span>
       <img src="${avUrl}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt=""
-           onerror="this.src='${generateArtisticAvatar(AVATAR_DATA[0],28)}'">
+           onerror="this.src='${fallback}'">
       <span>${escapeHtml(p.name)}</span>
       <span class="rs">${p.score || 0} pts</span>
     </div>`;
@@ -1092,7 +1061,8 @@ function buildAvatarGrid() {
     const isSel = i === 0 ? " sel" : "";
     html += `<div class="avatar-opt${isSel}" data-idx="${i}" onclick="pickAvatar(this)">
       <img src="${AVATARS[i].url}" alt="${AVATARS[i].name}" loading="lazy" 
-           style="border-radius:50%;width:52px;height:52px;object-fit:cover;">
+           style="border-radius:50%;width:52px;height:52px;object-fit:cover;"
+           onerror="this.src='${AVATARS[i].fallback}'">
       <div class="av-name">${AVATARS[i].name}</div>
     </div>`;
   }
@@ -1139,7 +1109,7 @@ async function playerJoinRoom() {
 
   const avImg = document.getElementById("player-wait-av-img");
   avImg.src = myAvatar.url;
-  avImg.onerror = function() { this.src = generateArtisticAvatar(myAvatar.palette, 80); };
+  avImg.onerror = function() { this.src = myAvatar.fallback; };
   avImg.alt = myAvatar.name;
   document.getElementById("player-wait-name").textContent = myName;
   document.getElementById("player-wait-code").textContent = "sala " + code;
@@ -1362,12 +1332,14 @@ async function renderPlayerPodium() {
     const p = items[i];
     const isMe = p.pid === myPid;
     const avIdx = AVATAR_DATA.findIndex(d => d.name === p.avatar);
-    const avUrl = getAvatarUrl(avIdx >= 0 ? avIdx : 0, 28);
+    const safeIdx = avIdx >= 0 ? avIdx : 0;
+    const avUrl = getAvatarUrl(safeIdx, 28);
+    const fallback = getFallbackAvatar(safeIdx, 28);
     const highlight = isMe ? 'border-color:var(--bloom);box-shadow:0 0 0 1px var(--bloom)' : '';
     listHtml += `<div class="rank-row" style="animation-delay:${i * 0.08}s;${highlight}">
       <span class="rn">${i + 1}</span>
       <img src="${avUrl}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt=""
-           onerror="this.src='${generateArtisticAvatar(AVATAR_DATA[0],28)}'">
+           onerror="this.src='${fallback}'">
       <span>${escapeHtml(p.name)}</span>
       <span class="rs">${p.score || 0} pts${p.bestStreak > 2 ? ' 🔥' + p.bestStreak : ''}</span>
     </div>`;
