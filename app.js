@@ -4,7 +4,7 @@
    ============================================================ */
 
 /* ============== FIREBASE CONFIG ============== */
-const firebaseConfig = {
+const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDEWTmLRXrlKBKBopYwjlgA6MD2833GY54",
   authDomain: "broto-quiz-7815c.firebaseapp.com",
   databaseURL: "https://broto-quiz-7815c-default-rtdb.firebaseio.com",
