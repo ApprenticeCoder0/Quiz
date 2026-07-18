@@ -4,7 +4,7 @@
    ============================================================ */
 
 /* ============== FIREBASE CONFIG ============== */
-const FIREBASE_CONFIG = {
+const firebaseConfig = {
   apiKey: "AIzaSyDEWTmLRXrlKBKBopYwjlgA6MD2833GY54",
   authDomain: "broto-quiz-7815c.firebaseapp.com",
   databaseURL: "https://broto-quiz-7815c-default-rtdb.firebaseio.com",
@@ -176,8 +176,8 @@ function sfxDrumRoll(){
 /* ============== FIREBASE INIT ============== */
 function initFirebase(){
   try{
-    if(FIREBASE_CONFIG.apiKey.indexOf("XXXX") === -1){
-      firebase.initializeApp(FIREBASE_CONFIG);
+    if(firebaseConfig.apiKey.indexOf("XXXX") === -1){
+      firebase.initializeApp(firebaseConfig);
       db = firebase.database();
       updateConnStatus(true);
       return true;
