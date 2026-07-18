@@ -1,13 +1,13 @@
 
 /* ============== FIREBASE CONFIG ============== */
 const firebaseConfig = {
-  apiKey: "AIzaSyDVQSpqANkJSwdv-zZo-W9jKzWUcItJrtc",
-  authDomain: "broto-quiz-4157c.firebaseapp.com",
-  projectId: "broto-quiz-4157c",
-  databaseURL: "https://broto-quiz-4157c-default-rtdb.firebaseio.com",
-  storageBucket: "broto-quiz-4157c.firebasestorage.app",
-  messagingSenderId: "971377890411",
-  appId: "1:971377890411:web:b3c1d9f89e2beffec80d2e"
+  apiKey: "AIzaSyDEWTmLRXrlKBKBopYwjlgA6MD2833GY54",
+  authDomain: "broto-quiz-7815c.firebaseapp.com",
+  databaseURL: "https://broto-quiz-7815c-default-rtdb.firebaseio.com",
+  projectId: "broto-quiz-7815c",
+  storageBucket: "broto-quiz-7815c.firebasestorage.app",
+  messagingSenderId: "379059171454",
+  appId: "1:379059171454:web:8574b77f5ec7eec8dbe82f"
 };
 
 /* ============== AVATARES — Personagens ============== */
