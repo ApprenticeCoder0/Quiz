@@ -1,17 +1,12 @@
-/* ============================================================
-   BROTO v3 — Quiz Coletivo: Etica Ambiental & Ecofeminismo
-   App Principal — GitHub Pages Ready
-   ============================================================ */
 
 /* ============== FIREBASE CONFIG ============== */
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  authDomain: "SEU-PROJETO.firebaseapp.com",
-  databaseURL: "https://SEU-PROJETO-default-rtdb.firebaseio.com",
-  projectId: "SEU-PROJETO",
-  storageBucket: "SEU-PROJETO.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:xxxxxxxxxxxxxxxx"
+const firebaseConfig = {
+  apiKey: "AIzaSyDVQSpqANkJSwdv-zZo-W9jKzWUcItJrtc",
+  authDomain: "broto-quiz-4157c.firebaseapp.com",
+  projectId: "broto-quiz-4157c",
+  storageBucket: "broto-quiz-4157c.firebasestorage.app",
+  messagingSenderId: "971377890411",
+  appId: "1:971377890411:web:b3c1d9f89e2beffec80d2e"
 };
 
 /* ============== AVATARES — Personagens ============== */
