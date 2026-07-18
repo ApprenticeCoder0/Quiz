@@ -15,38 +15,23 @@ const firebaseConfig = {
   appId: "1:379059171454:web:8574b77f5ec7eec8dbe82f"
 };
 
-/* ============== AVATARES - Fotos Reais ============== */
+/* ============== AVATARES - Gerados Dinamicamente ============== */
 const AVATAR_PALETTES = [
-  {name:"Chico Mendes", initials:"CM", bg:"#2d5a3d", bg2:"#4a8c5c", icon:"🌳",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Chico_Mendes.jpg/220px-Chico_Mendes.jpg"},
-  {name:"Vandana Shiva", initials:"VS", bg:"#5a3d2d", bg2:"#8c6a4a", icon:"🌾",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Vandana_Shiva.jpg/220px-Vandana_Shiva.jpg"},
-  {name:"Greta Thunberg", initials:"GT", bg:"#2d3d5a", bg2:"#4a6a8c", icon:"🌍",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Greta_Thunberg_01.jpg/220px-Greta_Thunberg_01.jpg"},
-  {name:"Marina Silva", initials:"MS", bg:"#3d5a2d", bg2:"#6a8c4a", icon:"🌿",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Marina_Silva.jpg/220px-Marina_Silva.jpg"},
-  {name:"David Attenborough", initials:"DA", bg:"#3d2d5a", bg2:"#6a4a8c", icon:"🦎",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/David_Attenborough.jpg/220px-David_Attenborough.jpg"},
-  {name:"Wangari Maathai", initials:"WM", bg:"#5a5a2d", bg2:"#8c8c4a", icon:"🌳",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Wangari_Maathai.jpg/220px-Wangari_Maathai.jpg"},
-  {name:"Jane Goodall", initials:"JG", bg:"#2d5a5a", bg2:"#4a8c8c", icon:"🐒",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Jane_Goodall.jpg/220px-Jane_Goodall.jpg"},
-  {name:"Leonardo DiCaprio", initials:"LD", bg:"#1a3a2a", bg2:"#3a6a4a", icon:"🎬",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Leonardo_Dicaprio_Cannes_2019.jpg/220px-Leonardo_Dicaprio_Cannes_2019.jpg"},
-  {name:"Rachel Carson", initials:"RC", bg:"#3a1a2a", bg2:"#6a3a4a", icon:"📖",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Rachel-Carson.jpg/220px-Rachel-Carson.jpg"},
-  {name:"Francoise d'Eaubonne", initials:"FE", bg:"#2a3a1a", bg2:"#4a6a3a", icon:"♀️",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Fran%C3%A7oise_d%27Eaubonne.jpg/220px-Fran%C3%A7oise_d%27Eaubonne.jpg"},
-  {name:"Donna Haraway", initials:"DH", bg:"#1a2a3a", bg2:"#3a4a6a", icon:"🐕",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Donna_Haraway.jpg/220px-Donna_Haraway.jpg"},
-  {name:"Val Plumwood", initials:"VP", bg:"#3a2a1a", bg2:"#6a4a3a", icon:"🌲",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Val_Plumwood.jpg/220px-Val_Plumwood.jpg"},
-  {name:"Carolyn Merchant", initials:"CM2", bg:"#2a1a3a", bg2:"#4a3a6a", icon:"📚",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Carolyn_Merchant.jpg/220px-Carolyn_Merchant.jpg"},
-  {name:"Severn Cullis-Suzuki", initials:"SS", bg:"#1a3a3a", bg2:"#3a6a6a", icon:"🎤",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Severn_Cullis-Suzuki.jpg/220px-Severn_Cullis-Suzuki.jpg"},
-  {name:"Xiuhtezcatl Martinez", initials:"XM", bg:"#3a3a1a", bg2:"#6a6a3a", icon:"🌵",
-   photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Xiuhtezcatl_Martinez.jpg/220px-Xiuhtezcatl_Martinez.jpg"}
+  {name:"Chico Mendes", initials:"CM", bg:"#2d5a3d", bg2:"#4a8c5c", icon:"🌳"},
+  {name:"Vandana Shiva", initials:"VS", bg:"#5a3d2d", bg2:"#8c6a4a", icon:"🌾"},
+  {name:"Greta Thunberg", initials:"GT", bg:"#2d3d5a", bg2:"#4a6a8c", icon:"🌍"},
+  {name:"Marina Silva", initials:"MS", bg:"#3d5a2d", bg2:"#6a8c4a", icon:"🌿"},
+  {name:"David Attenborough", initials:"DA", bg:"#3d2d5a", bg2:"#6a4a8c", icon:"🦎"},
+  {name:"Wangari Maathai", initials:"WM", bg:"#5a5a2d", bg2:"#8c8c4a", icon:"🌳"},
+  {name:"Jane Goodall", initials:"JG", bg:"#2d5a5a", bg2:"#4a8c8c", icon:"🐒"},
+  {name:"Leonardo DiCaprio", initials:"LD", bg:"#1a3a2a", bg2:"#3a6a4a", icon:"🎬"},
+  {name:"Rachel Carson", initials:"RC", bg:"#3a1a2a", bg2:"#6a3a4a", icon:"📖"},
+  {name:"Francoise d'Eaubonne", initials:"FE", bg:"#2a3a1a", bg2:"#4a6a3a", icon:"♀️"},
+  {name:"Donna Haraway", initials:"DH", bg:"#1a2a3a", bg2:"#3a4a6a", icon:"🐕"},
+  {name:"Val Plumwood", initials:"VP", bg:"#3a2a1a", bg2:"#6a4a3a", icon:"🌲"},
+  {name:"Carolyn Merchant", initials:"CM2", bg:"#2a1a3a", bg2:"#4a3a6a", icon:"📚"},
+  {name:"Severn Cullis-Suzuki", initials:"SS", bg:"#1a3a3a", bg2:"#3a6a6a", icon:"🎤"},
+  {name:"Xiuhtezcatl Martinez", initials:"XM", bg:"#3a3a1a", bg2:"#6a6a3a", icon:"🌵"}
 ];
 
 function generateAvatarSVG(palette, size) {
@@ -70,14 +55,11 @@ function generateAvatarSVG(palette, size) {
 
 function getAvatarUrl(index, size) {
   var p = AVATAR_PALETTES[index % AVATAR_PALETTES.length];
-  if (p.photo) {
-    return p.photo;
-  }
-  return generateAvatarSVG(p, size);
+  return generateAvatarSVG(p, size || 120);
 }
 
 const AVATARS = AVATAR_PALETTES.map(function(p, i) {
-  return {name: p.name, url: getAvatarUrl(i, 120), palette: p, photo: p.photo};
+  return {name: p.name, url: getAvatarUrl(i, 120), palette: p};
 });
 
 /* ============== FILTRO DE NOMES - ABRENGENTE ============== */
@@ -530,8 +512,8 @@ function renderLobbyPlayers(){
   for(var i=0;i<list.length;i++){
     var p = list[i];
     var palette = p.avatarPalette || AVATAR_PALETTES[0];
-    var avUrl = palette.photo || generateAvatarSVG(palette, 80);
-    html += '<div class="sprout"><img class="av" src="'+avUrl+'" alt="'+escapeHtml(p.name)+'" style="border-radius:50%;width:40px;height:40px;object-fit:cover;" onerror="this.src=\''+generateAvatarSVG(palette,80)+'\'"><div class="nm">'+escapeHtml(p.name)+'</div></div>';
+    var avUrl = generateAvatarSVG(palette, 80);
+    html += '<div class="sprout"><img class="av" src="'+avUrl+'" alt="'+escapeHtml(p.name)+'" style="border-radius:50%;width:40px;height:40px;object-fit:cover;"><div class="nm">'+escapeHtml(p.name)+'</div></div>';
   }
   grid.innerHTML = html;
 
@@ -694,10 +676,10 @@ async function updateLivePodium(){
     var isLeader = i === 0;
     var pct = ((p.score||0) / maxScore) * 100;
     var palette = p.avatarPalette || AVATAR_PALETTES[0];
-    var avUrl = palette.photo || generateAvatarSVG(palette, 36);
+    var avUrl = generateAvatarSVG(palette, 36);
     html += '<div class="live-podium-row '+(isLeader?"leader":"")+'">'+
       '<span class="lp-rank">#'+(i+1)+'</span>'+
-      '<img class="lp-av" src="'+avUrl+'" alt="" style="border-radius:50%;width:28px;height:28px;object-fit:cover;" onerror="this.src=\''+generateAvatarSVG(palette,36)+'\'">'+
+      '<img class="lp-av" src="'+avUrl+'" alt="" style="border-radius:50%;width:28px;height:28px;object-fit:cover;">'+
       '<span class="lp-name">'+escapeHtml(p.name)+'</span>'+
       '<span class="lp-score">'+(p.score||0)+' pts</span>'+
       '<div class="lp-bar" style="width:'+pct+'%"></div>'+
@@ -735,7 +717,7 @@ async function renderHostPodium(){
     var medal = isTop3 ? medals[idx] : "";
     var flower = isTop3 ? flowers[idx] : "🌱";
     var palette = p.avatarPalette || AVATAR_PALETTES[0];
-    var avUrl = palette.photo || generateAvatarSVG(palette, 56);
+    var avUrl = generateAvatarSVG(palette, 56);
     var topClass = isTop3 ? (idx===0 ? "top-1" : idx===1 ? "top-2" : "top-3") : "";
 
     var step = document.createElement("div");
@@ -759,8 +741,8 @@ async function renderHostPodium(){
   for(var i=0;i<items.length;i++){
     var p = items[i];
     var palette = p.avatarPalette || AVATAR_PALETTES[0];
-    var avUrl = palette.photo || generateAvatarSVG(palette, 28);
-    rlHtml += '<div class="rank-row" style="animation-delay:'+(i*0.08)+'s"><span class="rn">'+(i+1)+'</span><img src="'+avUrl+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt="" onerror="this.src=\''+generateAvatarSVG(palette,28)+'\'"><span>'+escapeHtml(p.name)+'</span><span class="rs">'+(p.score||0)+' pts</span></div>';
+    var avUrl = generateAvatarSVG(palette, 28);
+    rlHtml += '<div class="rank-row" style="animation-delay:'+(i*0.08)+'s"><span class="rn">'+(i+1)+'</span><img src="'+avUrl+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt=""><span>'+escapeHtml(p.name)+'</span><span class="rs">'+(p.score||0)+' pts</span></div>';
   }
   rl.innerHTML = rlHtml;
 
@@ -831,8 +813,7 @@ function buildAvatarGrid(){
   var html = "";
   for(var i=0;i<AVATARS.length;i++){
     var isSel = i===0 ? " sel" : "";
-    var avUrl = AVATARS[i].photo || AVATARS[i].url;
-    html += '<div class="avatar-opt'+isSel+'" data-idx="'+i+'" onclick="pickAvatar(this)"><img src="'+avUrl+'" alt="'+AVATARS[i].name+'" loading="lazy" style="border-radius:50%;width:56px;height:56px;object-fit:cover;" onerror="this.src=\''+AVATARS[i].url+'\'"><div class="av-name">'+AVATARS[i].name+'</div></div>';
+    html += '<div class="avatar-opt'+isSel+'" data-idx="'+i+'" onclick="pickAvatar(this)"><img src="'+AVATARS[i].url+'" alt="'+AVATARS[i].name+'" loading="lazy" style="border-radius:50%;width:56px;height:56px;object-fit:cover;"><div class="av-name">'+AVATARS[i].name+'</div></div>';
   }
   g.innerHTML = html;
   myAvatar = AVATARS[0];
@@ -860,9 +841,7 @@ async function playerJoinRoom(){
   var pRef = dbRef(dbPath("broto", code, "players", myPid));
   if(pRef) await pRef.set(p);
 
-  var avUrl = myAvatar.photo || myAvatar.url;
-  document.getElementById("player-wait-av-img").src = avUrl;
-  document.getElementById("player-wait-av-img").onerror = function() { this.src = myAvatar.url; };
+  document.getElementById("player-wait-av-img").src = myAvatar.url;
   document.getElementById("player-wait-av-img").alt = myAvatar.name;
   document.getElementById("player-wait-name").textContent = myName;
   document.getElementById("player-wait-code").textContent = "sala " + code;
@@ -1064,8 +1043,8 @@ async function renderPlayerPodium(){
     var p = items[i];
     var isMe = p.pid===myPid;
     var palette = p.avatarPalette || AVATAR_PALETTES[0];
-    var avUrl = palette.photo || generateAvatarSVG(palette, 28);
-    listHtml += '<div class="rank-row" style="animation-delay:'+(i*0.08)+'s'+(isMe?';border-color:var(--bloom);box-shadow:0 0 0 1px var(--bloom)':'')+'"><span class="rn">'+(i+1)+'</span><img src="'+avUrl+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt="" onerror="this.src=\''+generateAvatarSVG(palette,28)+'\'"><span>'+escapeHtml(p.name)+'</span><span class="rs">'+(p.score||0)+' pts'+(p.bestStreak>2?' 🔥'+p.bestStreak:'')+'</span></div>';
+    var avUrl = generateAvatarSVG(palette, 28);
+    listHtml += '<div class="rank-row" style="animation-delay:'+(i*0.08)+'s'+(isMe?';border-color:var(--bloom);box-shadow:0 0 0 1px var(--bloom)':'')+'"><span class="rn">'+(i+1)+'</span><img src="'+avUrl+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt=""><span>'+escapeHtml(p.name)+'</span><span class="rs">'+(p.score||0)+' pts'+(p.bestStreak>2?' 🔥'+p.bestStreak:'')+'</span></div>';
   }
   document.getElementById("player-final-list").innerHTML = listHtml;
 
