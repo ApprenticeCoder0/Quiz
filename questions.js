@@ -1,211 +1,140 @@
 /* ============================================================
-   BROTO v3 — Banco de Perguntas
-   20 questões sobre Ética Ambiental & Ecofeminismo
-   Baseado no conteúdo do slide da turma
+   BROTO v4.0 - Banco de Perguntas
+   Respostas embaralhadas para evitar padrao fixo
    ============================================================ */
 
-const QUESTIONS = [
+const QUESTION_MS = 20000;
+const OPT_MARK = ["A","B","C","D"];
+
+var QUESTIONS_RAW = [
   {
-    q: "Qual é o principal objetivo da Ética Ambiental?",
-    opts: [
-      "Criar leis para proteger apenas animais ameaçados",
-      "Estabelecer regras morais para a convivência respeitosa entre humanos e natureza",
-      "Promover o crescimento econômico sustentável",
-      "Proibir o uso de tecnologias industriais"
-    ],
+    q: "Qual conceito ecofeminista defende que a opressao das mulheres e a degradacao ambiental compartilham raizes sistemicas?",
+    opts: ["Ecologia profunda","Ecofeminismo","Ambientalismo liberal","Desenvolvimento sustentavel"],
     c: 1
   },
   {
-    q: "A questão central da Ética Ambiental é:",
-    opts: [
-      "Se a natureza deve ser preservada apenas em áreas protegidas",
-      "Se a natureza possui valor intrínseco ou apenas utilitário para os humanos",
-      "Se os animais têm direitos iguais aos humanos",
-      "Se o governo deve controlar todos os recursos naturais"
-    ],
+    q: "Quem e considerada uma das pioneiras do ecofeminismo com a obra 'Le Feminisme ou la Mort'?",
+    opts: ["Vandana Shiva","Francoise d'Eaubonne","Rachel Carson","Donna Haraway"],
     c: 1
   },
   {
-    q: "Qual obra de Rachel Carson alertou sobre os danos dos pesticidas?",
-    opts: [
-      "A Morte da Natureza",
-      "Primavera Silenciosa",
-      "O Princípio da Responsabilidade",
-      "A Ética da Terra"
-    ],
+    q: "Na etica ambiental, o que significa 'antropocentrismo fraco'?",
+    opts: ["A natureza tem valor intrinseco absoluto","Os humanos tem valor superior, mas devem respeitar a natureza","A natureza e apenas recurso para exploracao","A etica nao se aplica a natureza"],
     c: 1
   },
   {
-    q: "O que caracteriza a visão antropocêntrica?",
-    opts: [
-      "Considerar todos os seres vivos igualmente importantes",
-      "Colocar o ser humano como centro de tudo, sujeitando a natureza às suas necessidades",
-      "Defender que a natureza é sagrada e não deve ser tocada",
-      "Priorizar a proteção de ecossistemas sobre o desenvolvimento humano"
-    ],
+    q: "Qual e a principal critica do ecofeminismo ao desenvolvimento tecnologico desenfreado?",
+    opts: ["E economicamente inviavel","Reforca a dominacao sobre mulheres e natureza","Nao produz empregos suficientes","E muito lento para resolver problemas"],
     c: 1
   },
   {
-    q: "Quem criou o termo 'ecosofia' em 1973?",
-    opts: [
-      "Félix Guattari",
-      "Arne Naess",
-      "Van Rensselaer Potter",
-      "Françoise d'Eaubonne"
-    ],
+    q: "O conceito de 'justica ambiental' surgiu principalmente em qual contexto historico?",
+    opts: ["Movimento pelos direitos dos animais","Movimento dos direitos civis nos EUA","Revolucao Industrial na Europa","Descolonizacao na Africa"],
     c: 1
   },
   {
-    q: "O que significa 'ecosofia' segundo Arne Naess?",
-    opts: [
-      "Uma filosofia puramente teórica sobre ecologia",
-      "'Sabedoria da casa comum' — união de ética, ecologia e modo de vida",
-      "Um sistema político para governar recursos naturais",
-      "Uma técnica de agricultura orgânica"
-    ],
+    q: "Qual filosofa desenvolveu o conceito de 'companhia de especies' e a critica a natureza como recurso?",
+    opts: ["Martha Nussbaum","Val Plumwood","Judith Butler","Simone de Beauvoir"],
     c: 1
   },
   {
-    q: "Qual a diferença entre ecofilosofia e ecosofia?",
-    opts: [
-      "Não há diferença — são sinônimos",
-      "Ecofilosofia é teórica; ecosofia une teoria e prática cotidiana",
-      "Ecofilosofia é prática; ecosofia é apenas teórica",
-      "Ecofilosofia estuda animais; ecosofia estuda plantas"
-    ],
+    q: "Na perspectiva etica de Aldo Leopold, qual e o principio central?",
+    opts: ["Utilitarismo ambiental","Etica da terra","Deontologia ecologica","Virtude ambiental"],
     c: 1
   },
   {
-    q: "Segundo Félix Guattari, a crise ambiental é também:",
-    opts: [
-      "Apenas um problema de gestão de resíduos",
-      "Uma crise social e mental que exige transformação de valores",
-      "Um desafio exclusivamente tecnológico",
-      "Uma questão de falta de investimento em energia limpa"
-    ],
+    q: "O que caracteriza o 'ambientalismo de mercado'?",
+    opts: ["Proibicao total de atividades poluidoras","Uso de mecanismos economicos para internalizar custos ambientais","Controle estatal absoluto dos recursos","Rejeicao de qualquer intervencao humana"],
     c: 1
   },
   {
-    q: "Quem cunhou o termo 'bioética' em 1970?",
-    opts: [
-      "Rachel Carson",
-      "Van Rensselaer Potter",
-      "Arne Naess",
-      "Carolyn Merchant"
-    ],
+    q: "Qual e a relacao entre 'extractivismo' e violencia de genero segundo analises ecofeministas?",
+    opts: ["Nao ha relacao comprovada","Ambos sao formas de dominacao colonial e patriarcal","O extractivismo reduz a violencia","A violencia de genero e anterior ao extractivismo"],
     c: 1
   },
   {
-    q: "O que é a Bioética Ambiental?",
-    opts: [
-      "O estudo de ética apenas em laboratórios",
-      "A ligação entre saúde humana, dos animais e dos ecossistemas",
-      "Uma técnica de engenharia genética",
-      "A proteção exclusiva de espécies ameaçadas"
-    ],
+    q: "O conceito de 'buen vivir' (sumak kawsay) tem origem em qual tradicao?",
+    opts: ["Filosofia chinesa","Cosmovisao andina","Pensamento africano","Tradicao indigena norte-americana"],
     c: 1
   },
   {
-    q: "Qual princípio central une Ética Ambiental e Bioética?",
-    opts: [
-      "A responsabilidade com as gerações futuras",
-      "O crescimento econômico ilimitado",
-      "A proteção apenas de áreas urbanas",
-      "A exploração sustentável de recursos"
-    ],
-    c: 0
-  },
-  {
-    q: "O desenvolvimento sustentável busca:",
-    opts: [
-      "Maximizar o lucro a curto prazo",
-      "Atender necessidades atuais sem comprometer as futuras gerações",
-      "Proibir toda forma de industrialização",
-      "Priorizar apenas a justiça social"
-    ],
+    q: "Qual e a principal contribuicao de Donna Haraway para o pensamento ambiental?",
+    opts: ["Teoria da justica climatica","Ciborgue e simpoiese como figuras para repensar relacoes humano-natureza","Economia circular","Direitos dos rios"],
     c: 1
   },
   {
-    q: "Quem criou o termo 'ecofeminismo' em 1974?",
-    opts: [
-      "Vandana Shiva",
-      "Françoise d'Eaubonne",
-      "Val Plumwood",
-      "Donna Haraway"
-    ],
+    q: "Na etica ambiental, o que e 'extensao moral'?",
+    opts: ["Aumento da populacao mundial","Ampliacao do circulo de entidades com consideracao moral","Expansao territorial de parques","Crescimento economico sustentavel"],
     c: 1
   },
   {
-    q: "Qual é a ideia central do Ecofeminismo?",
-    opts: [
-      "Que as mulheres são naturalmente superiores na proteção ambiental",
-      "Que a mesma lógica de dominação explora tanto a natureza quanto as mulheres",
-      "Que apenas mulheres podem salvar o planeta",
-      "Que a natureza deve ser protegida independentemente das questões de gênero"
-    ],
+    q: "Qual movimento social brasileiro e frequentemente associado a defesa da floresta e dos direitos das mulheres?",
+    opts: ["Movimento dos Trabalhadores Rurais Sem Terra","Movimento das Mulheres Trabalhadoras Rurais","Movimento Gay","Movimento Negro"],
     c: 1
   },
   {
-    q: "O que o Ecofeminismo critica no sistema patriarcal?",
-    opts: [
-      "A valorização excessiva da natureza",
-      "A concentração de poder e a lógica de dominação e exploração",
-      "A falta de tecnologia industrial",
-      "A proteção excessiva de áreas naturais"
-    ],
+    q: "O que e 'violencia estrutural' no contexto ambiental?",
+    opts: ["Conflitos armados por recursos naturais","Formas institucionalizadas de dano ambiental que afetam grupos marginalizados","Desastres naturais","Caca ilegal de animais"],
     c: 1
   },
   {
-    q: "Segundo o Ecofeminismo, a sustentabilidade verdadeira só existe se:",
-    opts: [
-      "Houver crescimento econômico contínuo",
-      "For justa e não mantiver comunidades pobres e marginalizadas",
-      "As empresas pagarem impostos ambientais",
-      "Os governos controlarem todos os recursos naturais"
-    ],
+    q: "Qual e a posicao do ecofeminismo sobre a relacao entre ciencia e natureza?",
+    opts: ["A ciencia e neutra e objetiva","A ciencia tradicional frequentemente reproduz padroes de dominacao","A ciencia deve ser abandonada","Apenas ciencias naturais sao validas"],
     c: 1
   },
   {
-    q: "Qual ativista indiana é figura central no Ecofeminismo?",
-    opts: [
-      "Greta Thunberg",
-      "Vandana Shiva",
-      "Wangari Maathai",
-      "Jane Goodall"
-    ],
+    q: "O conceito de 'servicos ecossistemicos' e criticado por alguns autores porque:",
+    opts: ["E muito complexo para ser aplicado","Reduz a natureza a mercadoria e ignora valores nao economicos","Nao considera o clima","E exclusivo de paises ricos"],
     c: 1
   },
   {
-    q: "O que Vandana Shiva critica sobre a monocultura?",
-    opts: [
-      "Que ela é mais produtiva que a agricultura tradicional",
-      "Que destrói o solo e reduz a biodiversidade",
-      "Que é a única forma de alimentar a população mundial",
-      "Que não gera lucro suficiente para as empresas"
-    ],
+    q: "Qual e a contribuicao de Vandana Shiva para o pensamento ambiental?",
+    opts: ["Teoria da evolucao das especies","Critica aos monocultivos e patentes de sementes","Desenvolvimento de energia nuclear","Economia comportamental"],
     c: 1
   },
   {
-    q: "Qual crítica o Ecofeminismo enfrenta em relação ao essencialismo?",
-    opts: [
-      "De que ignora completamente a natureza",
-      "De que supõe que mulheres são 'naturalmente' mais próximas da natureza",
-      "De que defende a exploração mineral",
-      "De que não valoriza o conhecimento científico"
-    ],
+    q: "Na perspectiva ecofeminista, por que a crise climatica e tambem uma crise de genero?",
+    opts: ["As mulheres causam mais poluicao","As mulheres sao mais afetadas pelos impactos e menos representadas nas decisoes","O clima afeta apenas mulheres","As mulheres nao se preocupam com o clima"],
     c: 1
   },
   {
-    q: "Segundo o texto, o Ecofeminismo contribui para:",
-    opts: [
-      "A criação de leis que proíbem o trabalho feminino",
-      "A formulação de políticas públicas e a participação feminina em conselhos ecológicos",
-      "A industrialização acelerada das zonas rurais",
-      "A privatização de recursos naturais"
-    ],
+    q: "O que e 'justica intergeracional' na etica ambiental?",
+    opts: ["Igualdade entre geracoes atuais","Responsabilidade para com as geracoes futuras","Distribuicao de renda entre idosos","Igualdade racial"],
+    c: 1
+  },
+  {
+    q: "Qual e a relacao entre 'ecologia profunda' e ecofeminismo?",
+    opts: ["Sao identicos","Compartilham preocupacoes mas diferem na analise do papel das mulheres","Sao completamente opostos","O ecofeminismo rejeita a ecologia profunda"],
     c: 1
   }
 ];
 
-const QUESTION_MS = 20000;
-const OPT_MARK = ["A","B","C","D"];
+function shuffleArray(array) {
+  var arr = array.slice();
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+  }
+  return arr;
+}
+
+var QUESTIONS = [];
+for (var i = 0; i < QUESTIONS_RAW.length; i++) {
+  var q = QUESTIONS_RAW[i];
+  var optIndices = [0, 1, 2, 3];
+  var shuffledIndices = shuffleArray(optIndices);
+  var newCorrect = shuffledIndices.indexOf(q.c);
+  var newOpts = [];
+  for (var j = 0; j < 4; j++) {
+    newOpts.push(q.opts[shuffledIndices[j]]);
+  }
+  QUESTIONS.push({
+    q: q.q,
+    opts: newOpts,
+    c: newCorrect
+  });
+}
+
+QUESTIONS = shuffleArray(QUESTIONS);
