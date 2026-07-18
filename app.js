@@ -4,14 +4,14 @@
    ============================================================ */
 
 /* ============== FIREBASE CONFIG ============== */
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  authDomain: "SEU-PROJETO.firebaseapp.com",
-  databaseURL: "https://SEU-PROJETO-default-rtdb.firebaseio.com",
-  projectId: "SEU-PROJETO",
-  storageBucket: "SEU-PROJETO.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:xxxxxxxxxxxxxxxx"
+const firebaseConfig = {
+  apiKey: "AIzaSyDEWTmLRXrlKBKBopYwjlgA6MD2833GY54",
+  authDomain: "broto-quiz-7815c.firebaseapp.com",
+  databaseURL: "https://broto-quiz-7815c-default-rtdb.firebaseio.com",
+  projectId: "broto-quiz-7815c",
+  storageBucket: "broto-quiz-7815c.firebasestorage.app",
+  messagingSenderId: "379059171454",
+  appId: "1:379059171454:web:8574b77f5ec7eec8dbe82f"
 };
 
 /* ============== AVATARES — Personagens ============== */
