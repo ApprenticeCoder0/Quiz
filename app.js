@@ -393,7 +393,7 @@ function renderLobbyPlayers(){
   for(var i=0;i<list.length;i++){
     var p = list[i];
     var imgUrl = p.avatarUrl || p.avatar || "";
-    html += '<div class="sprout"><img class="av" src="'+imgUrl+'" alt="" onerror="this.onerror=null;this.style.display=\'none\';this.parentElement.insertAdjacentHTML(\'afterbegin\',\'<div class=\\'av\\'>🌱</div>\');"><div class="nm">'+escapeHtml(p.name)+'</div></div>';
+    html += '<div class="sprout"><img class="av" src="'+imgUrl+'" alt="" onerror="this.onerror=null;this.style.display=\'none\';this.parentElement.insertAdjacentHTML(\'afterbegin\',\'<div class=\\"av\\">🌱</div>\');"><div class="nm">'+escapeHtml(p.name)+'</div></div>';
   }
   grid.innerHTML = html;
 
