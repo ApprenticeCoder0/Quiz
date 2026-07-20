@@ -1,8 +1,6 @@
 /* BROTO v6.1 - Quiz Coletivo */
 console.log('[BROTO] App.js carregado v6.1');
 
-/* firebaseConfig carregado de config.js */
-
 const AVATAR_DATA = [
   {name:"Chico Mendes", seed:"chico-mendes", icon:"🌳", grad:["#2d5a3d","#5a9e6e"]},
   {name:"Vandana Shiva", seed:"vandana-shiva", icon:"🌾", grad:["#5a3d2d","#9e7a5a"]},
