@@ -1,5 +1,5 @@
-/* BROTO v5.3 - Quiz Coletivo */
-console.log('[BROTO] App.js carregado v5.3');
+/* BROTO v5.4 - Quiz Coletivo */
+console.log('[BROTO] App.js carregado v5.4');
 
 const firebaseConfig = {
   apiKey: "AIzaSyDEWTmLRXrlKBKBopYwjlgA6MD2833GY54",
@@ -206,7 +206,7 @@ var lastSeenQIndex = -1;
 var tickTimer = null;
 var localMeta = null;
 var hasAnsweredThisQ = false;
-var myLastAnswer = null; // FIX: guarda resposta localmente
+var myLastAnswer = null;
 var hostRoster = {};
 var db = null;
 var isDemoMode = false;
@@ -615,13 +615,21 @@ function goHostSetup() {
   }
 
   code = roomCode();
+
+  // FIX v5.4: Host gera a ordem das perguntas e opções UMA ÚNICA VEZ
+  var totalQs = getTotalQuestions();
+  var questionOrder = generateQuestionOrder(totalQs);
+  var optionOrders = generateOptionOrders(questionOrder);
+
   var meta = {
     status: "lobby",
     qIndex: -1,
     qStartAt: 0,
     duration: QUESTION_MS,
-    total: QUESTIONS.length,
-    createdAt: Date.now()
+    total: totalQs,
+    createdAt: Date.now(),
+    questionOrder: questionOrder,
+    optionOrders: optionOrders
   };
   localMeta = meta;
 
@@ -747,8 +755,10 @@ function listenForAnswers() {
 }
 
 function renderHostQuestion() {
-  var qd = QUESTIONS[localMeta.qIndex];
-  document.getElementById("host-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + QUESTIONS.length;
+  // FIX v5.4: usar getQuestion com o meta para garantir mesma ordem para todos
+  var qd = getQuestion(localMeta.qIndex, localMeta);
+  var total = localMeta.total || getTotalQuestions();
+  document.getElementById("host-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + total;
   document.getElementById("host-qnum").textContent = localMeta.qIndex + 1;
   document.getElementById("host-answered").textContent = "0 respostas";
   document.getElementById("host-qtext").textContent = qd.q;
@@ -790,7 +800,7 @@ function hostReveal() {
   if (metaRef) metaRef.set(localMeta);
 
   var qi = localMeta.qIndex;
-  var qd = QUESTIONS[qi];
+  var qd = getQuestion(qi, localMeta);
   var ansRef = dbRef(dbPath("broto", code, "answers", qi));
 
   function processAnswers(snap) {
@@ -839,7 +849,8 @@ function hostReveal() {
 
     document.getElementById("btn-reveal").style.display = "none";
     document.getElementById("btn-next").style.display = "inline-flex";
-    document.getElementById("btn-next-text").textContent = (qi + 1 < QUESTIONS.length) ? "Proxima →" : "Ver podio 🏆";
+    var totalQs = localMeta.total || getTotalQuestions();
+    document.getElementById("btn-next-text").textContent = (qi + 1 < totalQs) ? "Proxima →" : "Ver podio 🏆";
   }
 
   if (ansRef) {
@@ -850,7 +861,8 @@ function hostReveal() {
 }
 
 function hostNext() {
-  if (localMeta.qIndex + 1 < QUESTIONS.length) {
+  var totalQs = localMeta.total || getTotalQuestions();
+  if (localMeta.qIndex + 1 < totalQs) {
     localMeta.qIndex += 1;
     localMeta.status = "question";
     localMeta.qStartAt = Date.now();
@@ -911,7 +923,7 @@ function updateLivePodium() {
   });
 }
 
-/* ===== FINAL PODIUM — CINEMATOGRÁFICO v5.3 ===== */
+/* ===== FINAL PODIUM — CINEMATOGRÁFICO v5.4 ===== */
 function renderHostPodium() {
   clearInterval(tickTimer);
   livePodiumVisible = false;
@@ -932,13 +944,11 @@ function renderHostPodium() {
     var stage = document.getElementById("host-podium");
     stage.innerHTML = "";
 
-    // Criar container do pódio cinematográfico
     var cinematic = document.createElement("div");
     cinematic.className = "podium-cinematic";
     cinematic.id = "podium-cinematic";
     stage.appendChild(cinematic);
 
-    // Criar lista completa (inicialmente escondida)
     var fullList = document.createElement("div");
     fullList.className = "podium-full-list";
     fullList.id = "podium-full-list";
@@ -948,7 +958,6 @@ function renderHostPodium() {
     podiumItems = items;
     podiumRevealIndex = items.length - 1;
 
-    // Iniciar sequência de suspense
     setTimeout(function() {
       revealCinematicPodiumStep();
     }, 600);
@@ -960,7 +969,6 @@ function revealCinematicPodiumStep() {
   if (!cinematic) return;
 
   if (podiumRevealIndex < 0) {
-    // Todos revelados — mostrar lista completa
     setTimeout(function() {
       showFullPodiumList();
     }, 1200);
@@ -984,7 +992,6 @@ function revealCinematicPodiumStep() {
   var positionLabels = ["Primeiro Lugar", "Segundo Lugar", "Terceiro Lugar"];
   var positionLabel = isTop3 ? positionLabels[podiumRevealIndex] : (rank + "º Lugar");
 
-  // Montar card de spotlight
   var card = document.createElement("div");
   card.className = "podium-spotlight-card";
   card.id = "spotlight-card-" + podiumRevealIndex;
@@ -1003,16 +1010,13 @@ function revealCinematicPodiumStep() {
     (p.bestStreak > 2 ? '<div class="spotlight-streak">🔥 Série de ' + p.bestStreak + ' acertos</div>' : '') +
     '<div class="spotlight-medal">' + (isTop3 ? medal + " " + flower : flower) + '</div>';
 
-  // Limpar spotlight anterior
   cinematic.innerHTML = "";
   cinematic.appendChild(card);
 
-  // Animação de entrada
   requestAnimationFrame(function() {
     card.classList.add("spotlight-in");
   });
 
-  // Som apropriado
   if (isWinner) {
     sfxWinner();
     spawnConfetti();
@@ -1023,7 +1027,6 @@ function revealCinematicPodiumStep() {
     sfxReveal();
   }
 
-  // Próximo após delay dramático
   podiumRevealIndex--;
   var delay = isWinner ? 3000 : (podiumRevealIndex >= 2 ? 2200 : 2800);
   setTimeout(revealCinematicPodiumStep, delay);
@@ -1034,7 +1037,6 @@ function showFullPodiumList() {
   var fullList = document.getElementById("podium-full-list");
   if (!cinematic || !fullList) return;
 
-  // Fade out do spotlight
   cinematic.style.transition = "opacity 0.8s ease";
   cinematic.style.opacity = "0";
 
@@ -1072,7 +1074,6 @@ function showFullPodiumList() {
     }
     fullList.innerHTML = html;
 
-    // Animar barras
     setTimeout(function() {
       var maxScore = 1;
       for (var j = 0; j < podiumItems.length; j++) {
@@ -1226,7 +1227,7 @@ function handlePlayerMetaChange(meta) {
     lastSeenStatus = "question";
     lastSeenQIndex = meta.qIndex;
     hasAnsweredThisQ = false;
-    myLastAnswer = null; // FIX: reset resposta local
+    myLastAnswer = null;
     renderPlayerQuestion();
     show("screen-player-question");
   } else if (meta.status === "reveal" && lastSeenStatus !== "reveal") {
@@ -1242,8 +1243,10 @@ function handlePlayerMetaChange(meta) {
 
 function renderPlayerQuestion() {
   initAudio();
-  var qd = QUESTIONS[localMeta.qIndex];
-  document.getElementById("player-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + QUESTIONS.length;
+  // FIX v5.4: usar getQuestion com o meta para mesma ordem do host
+  var qd = getQuestion(localMeta.qIndex, localMeta);
+  var total = localMeta.total || getTotalQuestions();
+  document.getElementById("player-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + total;
   document.getElementById("player-qtext").textContent = qd.q;
   document.getElementById("player-answer-status").textContent = "";
 
@@ -1325,7 +1328,6 @@ function playerAnswer(idx) {
   if (hasAnsweredThisQ) return;
   hasAnsweredThisQ = true;
 
-  // FIX: guardar resposta localmente imediatamente
   myLastAnswer = {
     choice: idx,
     at: Date.now()
@@ -1342,7 +1344,8 @@ function playerAnswer(idx) {
 }
 
 function renderPlayerReveal() {
-  var qd = QUESTIONS[localMeta.qIndex];
+  // FIX v5.4: usar getQuestion com o meta para mesma ordem do host
+  var qd = getQuestion(localMeta.qIndex, localMeta);
   var ansRef = dbRef(dbPath("broto", code, "answers", localMeta.qIndex, myPid));
   var pRef = dbRef(dbPath("broto", code, "players", myPid));
 
@@ -1353,13 +1356,11 @@ function renderPlayerReveal() {
     var myAns = results[0].val();
     var p = results[1].val();
 
-    // FIX: usar resposta local como fallback se Firebase ainda não persistiu
     if (!myAns && myLastAnswer && myLastAnswer.choice !== undefined) {
       myAns = myLastAnswer;
       console.log('[BROTO] Usando resposta local:', myAns);
     }
 
-    // FIX: defesa extra — garantir que qd existe
     if (!qd) {
       console.error('[BROTO] qd indefinido para qIndex:', localMeta.qIndex);
       qd = { c: 0, opts: ["","","",""] };

@@ -1,6 +1,7 @@
 /* ============================================================
-   BROTO v5.3 — Banco de Perguntas
-   Respostas embaralhadas para evitar padrão fixo
+   BROTO v5.4 — Banco de Perguntas
+   Baseado exclusivamente no arquivo: Ética Ambiental e Ecofeminismo
+   Ordem das perguntas e opções definida pelo host via Firebase
    ============================================================ */
 
 const QUESTION_MS = 20000;
@@ -8,135 +9,289 @@ const OPT_MARK = ["A", "B", "C", "D"];
 
 const QUESTIONS_RAW = [
   {
-    q: "Qual conceito ecofeminista defende que a opressão das mulheres e a degradação ambiental compartilham raízes sistêmicas?",
-    opts: ["Ecologia profunda", "Ecofeminismo", "Ambientalismo liberal", "Desenvolvimento sustentável"],
+    q: "Qual é a questão central da Ética Ambiental?",
+    opts: [
+      "Se a natureza deve ser protegida por leis internacionais",
+      "Se a natureza possui valor apenas por sua utilidade ou também valor intrínseco",
+      "Se os animais devem ter os mesmos direitos que os humanos",
+      "Se a tecnologia pode resolver todos os problemas ambientais"
+    ],
     c: 1
   },
   {
-    q: "Quem é considerada uma das pioneiras do ecofeminismo com a obra 'Le Féminisme ou la Mort'?",
-    opts: ["Vandana Shiva", "Françoise d'Eaubonne", "Rachel Carson", "Donna Haraway"],
+    q: "Quem escreveu 'Primavera Silenciosa', obra que alertou sobre pesticidas e poluição?",
+    opts: [
+      "Arne Naess",
+      "Rachel Carson",
+      "Françoise d'Eaubonne",
+      "Vandana Shiva"
+    ],
     c: 1
   },
   {
-    q: "Na ética ambiental, o que significa 'antropocentrismo fraco'?",
-    opts: ["A natureza tem valor intrínseco absoluto", "Os humanos têm valor superior, mas devem respeitar a natureza", "A natureza é apenas recurso para exploração", "A ética não se aplica à natureza"],
+    q: "O que caracteriza a visão antropocêntrica em relação à natureza?",
+    opts: [
+      "A natureza tem valor próprio independente dos humanos",
+      "O ser humano é o centro de tudo e a natureza existe para atender suas necessidades",
+      "Todos os seres vivos têm direitos iguais",
+      "A natureza deve ser preservada sem qualquer intervenção humana"
+    ],
     c: 1
   },
   {
-    q: "Qual é a principal crítica do ecofeminismo ao desenvolvimento tecnológico desenfreado?",
-    opts: ["É economicamente inviável", "Reforça a dominação sobre mulheres e natureza", "Não produz empregos suficientes", "É muito lento para resolver problemas"],
+    q: "Qual é a diferença entre ecofilosofia e ecosofia?",
+    opts: [
+      "A ecofilosofia é prática e a ecosofia é teórica",
+      "A ecofilosofia é teórica e a ecosofia une teoria e prática cotidiana",
+      "Não há diferença, são sinônimos",
+      "A ecosofia estuda apenas animais e a ecofilosofia estuda plantas"
+    ],
     c: 1
   },
   {
-    q: "O conceito de 'justiça ambiental' surgiu principalmente em qual contexto histórico?",
-    opts: ["Movimento pelos direitos dos animais", "Movimento dos direitos civis nos EUA", "Revolução Industrial na Europa", "Descolonização na África"],
+    q: "Quem criou o termo 'ecosofia' em 1973?",
+    opts: [
+      "Félix Guattari",
+      "Arne Naess",
+      "Van Rensselaer Potter",
+      "Françoise d'Eaubonne"
+    ],
     c: 1
   },
   {
-    q: "Qual filósofa desenvolveu o conceito de 'companhia de espécies' e a crítica à natureza como recurso?",
-    opts: ["Martha Nussbaum", "Val Plumwood", "Judith Butler", "Simone de Beauvoir"],
+    q: "O que significa 'ecosofia' segundo Arne Naess?",
+    opts: [
+      "Estudo das relações entre ética e natureza",
+      "'Sabedoria da casa comum' — filosofia prática que une ética, ecologia e modo de vida",
+      "Teoria da evolução das espécies",
+      "Economia baseada em recursos naturais"
+    ],
     c: 1
   },
   {
-    q: "Na perspectiva ética de Aldo Leopold, qual é o princípio central?",
-    opts: ["Utilitarismo ambiental", "Ética da terra", "Deontologia ecológica", "Virtude ambiental"],
+    q: "O que é o ecocentrismo defendido por Arne Naess?",
+    opts: [
+      "A natureza deve ser explorada para o benefício humano",
+      "A natureza tem valor próprio e os humanos são apenas uma parte do todo",
+      "A tecnologia é a solução para todos os problemas ambientais",
+      "Apenas ecossistemas inteiros têm valor, não seres individuais"
+    ],
     c: 1
   },
   {
-    q: "O que caracteriza o 'ambientalismo de mercado'?",
-    opts: ["Proibição total de atividades poluidoras", "Uso de mecanismos econômicos para internalizar custos ambientais", "Controle estatal absoluto dos recursos", "Rejeição de qualquer intervenção humana"],
+    q: "Segundo Félix Guattari, a crise ambiental é também uma crise:",
+    opts: [
+      "Econômica e política",
+      "Social e mental",
+      "Religiosa e espiritual",
+      "Científica e tecnológica"
+    ],
     c: 1
   },
   {
-    q: "Qual é a relação entre 'extrativismo' e violência de gênero segundo análises ecofeministas?",
-    opts: ["Não há relação comprovada", "Ambos são formas de dominação colonial e patriarcal", "O extrativismo reduz a violência", "A violência de gênero é anterior ao extrativismo"],
+    q: "Quem cunhou o termo 'bioética' em 1970?",
+    opts: [
+      "Arne Naess",
+      "Van Rensselaer Potter",
+      "Rachel Carson",
+      "Félix Guattari"
+    ],
     c: 1
   },
   {
-    q: "O conceito de 'buen vivir' (sumak kawsay) tem origem em qual tradição?",
-    opts: ["Filosofia chinesa", "Cosmovisão andina", "Pensamento africano", "Tradição indígena norte-americana"],
+    q: "Qual era a intenção original de Van Rensselaer Potter ao criar o termo 'bioética'?",
+    opts: [
+      "Criar leis de proteção ambiental",
+      "Unir conhecimento biológico aos valores éticos para garantir a sobrevivência humana",
+      "Defender os direitos dos animais",
+      "Criticar o desenvolvimento tecnológico"
+    ],
     c: 1
   },
   {
-    q: "Qual é a principal contribuição de Donna Haraway para o pensamento ambiental?",
-    opts: ["Teoria da justiça climática", "Ciborgue e simpoiese como figuras para repensar relações humano-natureza", "Economia circular", "Direitos dos rios"],
+    q: "O que é a responsabilidade intergeracional na Ética Ambiental?",
+    opts: [
+      "A obrigação de cuidar dos idosos",
+      "A obrigação de não comprometer a vida das gerações futuras com nossas escolhas atuais",
+      "A divisão igual de recursos entre todas as gerações vivas",
+      "A transmissão de conhecimento ecológico para as crianças"
+    ],
     c: 1
   },
   {
-    q: "Na ética ambiental, o que é 'extensão moral'?",
-    opts: ["Aumento da população mundial", "Ampliação do círculo de entidades com consideração moral", "Expansão territorial de parques", "Crescimento econômico sustentável"],
+    q: "O que é o desenvolvimento sustentável?",
+    opts: [
+      "Crescimento econômico sem limites",
+      "Atender às necessidades atuais sem comprometer as futuras gerações",
+      "Proibição total de atividades industriais",
+      "Uso exclusivo de energia renovável"
+    ],
     c: 1
   },
   {
-    q: "Qual movimento social brasileiro é frequentemente associado à defesa da floresta e dos direitos das mulheres?",
-    opts: ["Movimento dos Trabalhadores Rurais Sem Terra", "Movimento das Mulheres Trabalhadoras Rurais", "Movimento Gay", "Movimento Negro"],
+    q: "Quem criou o termo 'Ecofeminismo' em 1974?",
+    opts: [
+      "Vandana Shiva",
+      "Françoise d'Eaubonne",
+      "Rachel Carson",
+      "Arne Naess"
+    ],
     c: 1
   },
   {
-    q: "O que é 'violência estrutural' no contexto ambiental?",
-    opts: ["Conflitos armados por recursos naturais", "Formas institucionalizadas de dano ambiental que afetam grupos marginalizados", "Desastres naturais", "Caça ilegal de animais"],
+    q: "Qual é a ideia central do Ecofeminismo?",
+    opts: [
+      "As mulheres são naturalmente mais próximas da natureza",
+      "A mesma lógica que domina a natureza justifica a desigualdade de gênero",
+      "A natureza deve ser protegida por mulheres",
+      "O feminismo e o ambientalismo são movimentos separados"
+    ],
     c: 1
   },
   {
-    q: "Qual é a posição do ecofeminismo sobre a relação entre ciência e natureza?",
-    opts: ["A ciência é neutra e objetiva", "A ciência tradicional frequentemente reproduz padrões de dominação", "A ciência deve ser abandonada", "Apenas ciências naturais são válidas"],
+    q: "O que o Ecofeminismo critica no sistema patriarcal?",
+    opts: [
+      "A falta de participação feminina na política",
+      "A concentração de poder nas mãos dos homens e a valorização da dominação e exploração",
+      "A ausência de leis de proteção ambiental",
+      "A exclusão das mulheres do mercado de trabalho"
+    ],
     c: 1
   },
   {
-    q: "O conceito de 'serviços ecossistêmicos' é criticado por alguns autores porque:",
-    opts: ["É muito complexo para ser aplicado", "Reduz a natureza a mercadoria e ignora valores não econômicos", "Não considera o clima", "É exclusivo de países ricos"],
+    q: "Qual crítica o Ecofeminismo faz ao modelo capitalista industrial?",
+    opts: [
+      "Ele não produz empregos suficientes",
+      "Busca crescimento infinito em um planeta de recursos finitos",
+      "É muito lento para resolver problemas",
+      "Não investe em tecnologia verde"
+    ],
     c: 1
   },
   {
-    q: "Qual é a contribuição de Vandana Shiva para o pensamento ambiental?",
-    opts: ["Teoria da evolução das espécies", "Crítica aos monocultivos e patentes de sementes", "Desenvolvimento de energia nuclear", "Economia comportamental"],
+    q: "Quem é Vandana Shiva e qual sua principal contribuição ao Ecofeminismo?",
+    opts: [
+      "Filósofa francesa que criou o termo ecofeminismo",
+      "Cientista e ativista indiana que defende biodiversidade e critica monocultura e patentes de sementes",
+      "Autora de 'Primavera Silenciosa'",
+      "Criadora do conceito de ecosofia"
+    ],
     c: 1
   },
   {
-    q: "Na perspectiva ecofeminista, por que a crise climática é também uma crise de gênero?",
-    opts: ["As mulheres causam mais poluição", "As mulheres são mais afetadas pelos impactos e menos representadas nas decisões", "O clima afeta apenas mulheres", "As mulheres não se preocupam com o clima"],
+    q: "O que a agroecologia representa segundo o texto?",
+    opts: [
+      "Uso intensivo de pesticidas para aumentar a produção",
+      "Agricultura sustentável que respeita o solo e a saúde",
+      "Monocultura em larga escala",
+      "Patente de sementes por multinacionais"
+    ],
     c: 1
   },
   {
-    q: "O que é 'justiça intergeracional' na ética ambiental?",
-    opts: ["Igualdade entre gerações atuais", "Responsabilidade para com as gerações futuras", "Distribuição de renda entre idosos", "Igualdade racial"],
+    q: "Qual é uma das principais críticas feitas ao Ecofeminismo?",
+    opts: [
+      "Ser muito radical em suas propostas",
+      "O risco de essencialismo — supor que mulheres são 'naturalmente' mais próximas da natureza",
+      "Não defender a proteção ambiental",
+      "Ser exclusivo de países ricos"
+    ],
     c: 1
   },
   {
-    q: "Qual é a relação entre 'ecologia profunda' e ecofeminismo?",
-    opts: ["São idênticos", "Compartilham preocupações mas diferem na análise do papel das mulheres", "São completamente opostos", "O ecofeminismo rejeita a ecologia profunda"],
+    q: "Segundo o texto, o que o Ecofeminismo demonstra sobre o futuro justo?",
+    opts: [
+      "Que a tecnologia resolverá todos os problemas",
+      "Que cuidar de si, do outro e do planeta é uma única e mesma missão",
+      "Que apenas mulheres podem salvar o planeta",
+      "Que o capitalismo verde é a solução"
+    ],
     c: 1
   }
 ];
 
-function shuffleArray(array) {
-  const arr = array.slice();
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+/* ============================================================
+   FUNÇÕES DE ACESSO DETERMINÍSTICO
+   A ordem das perguntas e opções é definida pelo host no meta.
+   Todos os clientes usam a MESMA ordem via Firebase.
+   ============================================================ */
+
+/**
+ * Gera uma ordem aleatória de índices [0, 1, ..., n-1]
+ * Chamada UMA ÚNICA VEZ pelo host ao criar a sala.
+ */
+function generateQuestionOrder(count) {
+  var arr = [];
+  for (var i = 0; i < count; i++) arr.push(i);
+  // Fisher-Yates shuffle
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
   }
   return arr;
 }
 
-const QUESTIONS = [];
-for (let i = 0; i < QUESTIONS_RAW.length; i++) {
-  const q = QUESTIONS_RAW[i];
-  const optIndices = [0, 1, 2, 3];
-  const shuffledIndices = shuffleArray(optIndices);
-  const newCorrect = shuffledIndices.indexOf(q.c);
-  const newOpts = [];
-  for (let j = 0; j < 4; j++) {
-    newOpts.push(q.opts[shuffledIndices[j]]);
+/**
+ * Gera embaralhamento das opções para cada pergunta.
+ * Retorna array de arrays: optionOrders[qIndex] = [shuffled opt indices]
+ */
+function generateOptionOrders(questionOrder) {
+  var orders = [];
+  for (var i = 0; i < questionOrder.length; i++) {
+    var rawIdx = questionOrder[i];
+    var rawQ = QUESTIONS_RAW[rawIdx];
+    var optIndices = [];
+    for (var j = 0; j < rawQ.opts.length; j++) optIndices.push(j);
+    // Fisher-Yates shuffle
+    for (var j = optIndices.length - 1; j > 0; j--) {
+      var k = Math.floor(Math.random() * (j + 1));
+      var tmp = optIndices[j];
+      optIndices[j] = optIndices[k];
+      optIndices[k] = tmp;
+    }
+    orders.push(optIndices);
   }
-  QUESTIONS.push({
-    q: q.q,
-    opts: newOpts,
-    c: newCorrect
-  });
+  return orders;
 }
 
-// FIX: atribuir o resultado do shuffle de volta ao array
-const shuffledQuestions = shuffleArray(QUESTIONS);
-for (let i = 0; i < shuffledQuestions.length; i++) {
-  QUESTIONS[i] = shuffledQuestions[i];
+/**
+ * Retorna a pergunta na posição qIndex, de acordo com a ordem definida no meta.
+ * Todos os clientes (host + jogadores) chamam esta função com o MESMO meta.
+ */
+function getQuestion(qIndex, meta) {
+  if (!meta || !meta.questionOrder || !meta.optionOrders) {
+    // Fallback: retorna pergunta original sem embaralhamento (não deve acontecer)
+    return QUESTIONS_RAW[qIndex] || QUESTIONS_RAW[0];
+  }
+  var rawIdx = meta.questionOrder[qIndex];
+  if (rawIdx === undefined) rawIdx = qIndex;
+  var rawQ = QUESTIONS_RAW[rawIdx];
+  if (!rawQ) return QUESTIONS_RAW[0];
+
+  var optShuffle = meta.optionOrders[qIndex];
+  if (!optShuffle) {
+    return { q: rawQ.q, opts: rawQ.opts.slice(), c: rawQ.c };
+  }
+
+  var newOpts = [];
+  for (var i = 0; i < optShuffle.length; i++) {
+    newOpts.push(rawQ.opts[optShuffle[i]]);
+  }
+  var newCorrect = optShuffle.indexOf(rawQ.c);
+  if (newCorrect === -1) newCorrect = rawQ.c;
+
+  return {
+    q: rawQ.q,
+    opts: newOpts,
+    c: newCorrect
+  };
+}
+
+/**
+ * Retorna o número total de perguntas.
+ */
+function getTotalQuestions() {
+  return QUESTIONS_RAW.length;
 }
