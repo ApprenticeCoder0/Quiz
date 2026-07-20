@@ -1,15 +1,7 @@
 /* BROTO v6.1 - Quiz Coletivo */
 console.log('[BROTO] App.js carregado v6.1');
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDEWTmLRXrlKBKBopYwjlgA6MD2833GY54",
-  authDomain: "broto-quiz-7815c.firebaseapp.com",
-  databaseURL: "https://broto-quiz-7815c-default-rtdb.firebaseio.com",
-  projectId: "broto-quiz-7815c",
-  storageBucket: "broto-quiz-7815c.firebasestorage.app",
-  messagingSenderId: "379059171454",
-  appId: "1:379059171454:web:8574b77f5ec7eec8dbe82f"
-};
+/* firebaseConfig carregado de config.js */
 
 const AVATAR_DATA = [
   {name:"Chico Mendes", seed:"chico-mendes", icon:"🌳", grad:["#2d5a3d","#5a9e6e"]},
