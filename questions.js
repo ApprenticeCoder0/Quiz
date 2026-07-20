@@ -1,5 +1,5 @@
 /* ============================================================
-   BROTO v5.0 — Banco de Perguntas
+   BROTO v5.2 — Banco de Perguntas
    Respostas embaralhadas para evitar padrão fixo
    ============================================================ */
 

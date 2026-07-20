@@ -1,5 +1,5 @@
 /* ============================================================
-   BROTO v5.1 — Quiz Coletivo: Ética Ambiental & Ecofeminismo
+   BROTO v5.2 — Quiz Coletivo: Ética Ambiental & Ecofeminismo
    Avatares com rosto (DiceBear Notionists) + Fallback SVG
    ============================================================ */
 
@@ -14,11 +14,7 @@ const firebaseConfig = {
   appId: "1:379059171454:web:8574b77f5ec7eec8dbe82f"
 };
 
-/* ============== AVATARES COM ROSTO ==============
-   Usamos DiceBear Notionists — gera ilustrações de rosto
-   únicas e consistentes por seed. Serviço estável, gratuito.
-   Fallback SVG artístico garantido via onerror.
-   ==================================================== */
+/* ============== AVATARES COM ROSTO ============== */
 const AVATAR_DATA = [
   {name:"Chico Mendes", seed:"chico-mendes", icon:"🌳",
    grad:["#2d5a3d","#5a9e6e"]},
@@ -54,7 +50,6 @@ const AVATAR_DATA = [
 
 function getDiceBearUrl(seed, size) {
   size = size || 120;
-  // DiceBear Notionists — ilustrações de rosto elegantes e únicas
   return `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(seed)}&size=${size}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
 }
 
@@ -206,7 +201,8 @@ function containsBadWord(name) {
     if (noSpaces.indexOf(wordNoSpace) !== -1) return true;
   }
 
-  if (/(.)(){5,}/.test(lower)) return true;
+  // CORREÇÃO CRÍTICA v5.2: backreference \1 em vez de caractere de controle
+  if (/(.)(\1){5,}/.test(lower)) return true;
   if (/^\d+$/.test(lower)) return true;
 
   return false;
@@ -251,6 +247,7 @@ let podiumItems = [];
 let livePodiumVisible = false;
 let myStreak = 0;
 let myBestStreak = 0;
+let gapUpdatePending = false;
 
 /* ============== AUDIO ============== */
 function initAudio() {
@@ -487,22 +484,51 @@ function calcPoints(elapsedMs, streak) {
 
 /* ============== PARTICLES & EFFECTS ============== */
 function spawnConfetti() {
-  const colors = ["#e07098", "#6abf6a", "#d4b840", "#f0c0d0", "#90e090", "#ff7b7b", "#5ecdc4"];
-  for (let i = 0; i < 50; i++) {
+  const colors = ["#e07098", "#6abf6a", "#d4b840", "#f0c0d0", "#90e090", "#ff7b7b", "#5ecdc4", "#ffd700", "#ff8c00", "#40e0d0"];
+  const shapes = ["circle", "square", "triangle", "star"];
+  for (let i = 0; i < 80; i++) {
     const el = document.createElement("div");
     el.className = "confetti";
     el.style.left = (Math.random() * 100) + "vw";
     el.style.top = "-10px";
-    const size = 6 + Math.random() * 10;
+    const size = 6 + Math.random() * 14;
     el.style.width = size + "px";
     el.style.height = size + "px";
     el.style.background = colors[Math.floor(Math.random() * colors.length)];
-    el.style.borderRadius = Math.random() > 0.5 ? "50%" : "3px";
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    if (shape === "circle") el.style.borderRadius = "50%";
+    else if (shape === "triangle") {
+      el.style.width = "0"; el.style.height = "0";
+      el.style.background = "transparent";
+      el.style.borderLeft = (size/2) + "px solid transparent";
+      el.style.borderRight = (size/2) + "px solid transparent";
+      el.style.borderBottom = size + "px solid " + colors[Math.floor(Math.random() * colors.length)];
+    } else if (shape === "star") {
+      el.style.clipPath = "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)";
+    }
     el.style.animationDuration = (2 + Math.random() * 2.5) + "s";
     el.style.animationDelay = (Math.random() * 0.6) + "s";
     el.style.opacity = 0.7 + Math.random() * 0.3;
+    el.style.transform = `rotate(${Math.random() * 360}deg)`;
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 5000);
+  }
+}
+
+function spawnGoldRain() {
+  for (let i = 0; i < 40; i++) {
+    const el = document.createElement("div");
+    el.className = "gold-rain";
+    el.style.left = (Math.random() * 100) + "vw";
+    el.style.top = "-20px";
+    const size = 4 + Math.random() * 8;
+    el.style.width = size + "px";
+    el.style.height = size + "px";
+    el.style.animationDuration = (1.5 + Math.random() * 2) + "s";
+    el.style.animationDelay = (Math.random() * 1) + "s";
+    el.style.opacity = 0.6 + Math.random() * 0.4;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
   }
 }
 
@@ -981,9 +1007,12 @@ function revealNextPodiumStep() {
       const winnerStep = document.getElementById("podium-step-0");
       if (winnerStep) {
         winnerStep.classList.add("winner-glow");
+        winnerStep.classList.add("crowned");
         sfxWinner();
         spawnConfetti();
-        setTimeout(spawnConfetti, 300);
+        spawnGoldRain();
+        setTimeout(() => { spawnConfetti(); spawnGoldRain(); }, 400);
+        setTimeout(() => { spawnConfetti(); spawnGoldRain(); }, 900);
       }
     }, 800);
     return;
@@ -1184,32 +1213,37 @@ function updatePlayerTimer() {
 }
 
 async function updatePlayerGap() {
-  if (!code || !myPid) return;
-  const playersRef = dbRef(dbPath("broto", code, "players"));
-  const snap = playersRef ? await playersRef.get() : { val: () => null };
-  const items = [];
-  const val = snap.val() || {};
-  for (const k in val) if (val[k]) items.push(val[k]);
-  items.sort((a, b) => (b.score || 0) - (a.score || 0));
+  if (!code || !myPid || gapUpdatePending) return;
+  gapUpdatePending = true;
+  try {
+    const playersRef = dbRef(dbPath("broto", code, "players"));
+    const snap = playersRef ? await playersRef.get() : { val: () => null };
+    const items = [];
+    const val = snap.val() || {};
+    for (const k in val) if (val[k]) items.push(val[k]);
+    items.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-  let myRank = -1, myScore = 0;
-  for (let i = 0; i < items.length; i++) {
-    if (items[i].pid === myPid) { myRank = i + 1; myScore = items[i].score || 0; }
-  }
+    let myRank = -1, myScore = 0;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].pid === myPid) { myRank = i + 1; myScore = items[i].score || 0; }
+    }
 
-  const gapEl = document.getElementById("player-gap-info");
-  const gapText = document.getElementById("player-gap-text");
+    const gapEl = document.getElementById("player-gap-info");
+    const gapText = document.getElementById("player-gap-text");
 
-  if (myRank > 1 && items[myRank - 2]) {
-    const gap = (items[myRank - 2].score || 0) - myScore;
-    gapEl.style.display = "inline-flex";
-    gapText.textContent = "Você está a " + gap + " pts do " + (myRank - 1) + "º lugar";
-  } else if (myRank === 1 && items[1]) {
-    const lead = myScore - (items[1].score || 0);
-    gapEl.style.display = "inline-flex";
-    gapText.textContent = "Liderando por " + lead + " pts 🔥";
-  } else {
-    gapEl.style.display = "none";
+    if (myRank > 1 && items[myRank - 2]) {
+      const gap = (items[myRank - 2].score || 0) - myScore;
+      gapEl.style.display = "inline-flex";
+      gapText.textContent = "Você está a " + gap + " pts do " + (myRank - 1) + "º lugar";
+    } else if (myRank === 1 && items[1]) {
+      const lead = myScore - (items[1].score || 0);
+      gapEl.style.display = "inline-flex";
+      gapText.textContent = "Liderando por " + lead + " pts 🔥";
+    } else {
+      gapEl.style.display = "none";
+    }
+  } finally {
+    gapUpdatePending = false;
   }
 }
 
@@ -1218,7 +1252,7 @@ setInterval(() => {
     updatePlayerTimer();
     updatePlayerGap();
   }
-}, 250);
+}, 800);
 
 async function playerAnswer(idx) {
   if (hasAnsweredThisQ) return;
@@ -1351,7 +1385,8 @@ async function renderPlayerPodium() {
   if (myRank <= 3 && myRank > 0) {
     sfxWinner();
     spawnConfetti();
-    setTimeout(spawnConfetti, 400);
+    spawnGoldRain();
+    setTimeout(() => { spawnConfetti(); spawnGoldRain(); }, 400);
   }
 }
 
