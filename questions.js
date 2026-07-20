@@ -1,9 +1,3 @@
-/* ============================================================
-   BROTO v5.4 — Banco de Perguntas
-   Baseado exclusivamente no arquivo: Ética Ambiental e Ecofeminismo
-   Ordem das perguntas e opções definida pelo host via Firebase
-   ============================================================ */
-
 const QUESTION_MS = 20000;
 const OPT_MARK = ["A", "B", "C", "D"];
 
