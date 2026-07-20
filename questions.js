@@ -1,5 +1,5 @@
 /* ============================================================
-   BROTO v5.2 — Banco de Perguntas
+   BROTO v5.3 — Banco de Perguntas
    Respostas embaralhadas para evitar padrão fixo
    ============================================================ */
 
@@ -135,5 +135,8 @@ for (let i = 0; i < QUESTIONS_RAW.length; i++) {
   });
 }
 
-// Shuffle question order too
-shuffleArray(QUESTIONS);
+// FIX: atribuir o resultado do shuffle de volta ao array
+const shuffledQuestions = shuffleArray(QUESTIONS);
+for (let i = 0; i < shuffledQuestions.length; i++) {
+  QUESTIONS[i] = shuffledQuestions[i];
+}

@@ -1,5 +1,5 @@
-/* BROTO v5.2 - Quiz Coletivo */
-console.log('[BROTO] App.js carregado v5.2');
+/* BROTO v5.3 - Quiz Coletivo */
+console.log('[BROTO] App.js carregado v5.3');
 
 const firebaseConfig = {
   apiKey: "AIzaSyDEWTmLRXrlKBKBopYwjlgA6MD2833GY54",
@@ -206,6 +206,7 @@ var lastSeenQIndex = -1;
 var tickTimer = null;
 var localMeta = null;
 var hasAnsweredThisQ = false;
+var myLastAnswer = null; // FIX: guarda resposta localmente
 var hostRoster = {};
 var db = null;
 var isDemoMode = false;
@@ -307,6 +308,17 @@ function sfxStreak(n) {
 function sfxPlayerJoined() {
   playTone(600, "sine", 0.08, 0.06);
   setTimeout(function(){ playTone(750, "sine", 0.12, 0.06); }, 80);
+}
+
+function sfxSpotlight() {
+  playTone(220, "sine", 0.30, 0.08);
+  setTimeout(function(){ playTone(330, "sine", 0.40, 0.10); }, 200);
+  setTimeout(function(){ playTone(440, "sine", 0.50, 0.12); }, 500);
+}
+
+function sfxSuspense() {
+  playTone(110, "sine", 0.80, 0.06);
+  setTimeout(function(){ playTone(130, "sine", 0.60, 0.05); }, 400);
 }
 
 /* ===== FIREBASE INIT ===== */
@@ -899,7 +911,7 @@ function updateLivePodium() {
   });
 }
 
-/* ===== FINAL PODIUM ===== */
+/* ===== FINAL PODIUM — CINEMATOGRÁFICO v5.3 ===== */
 function renderHostPodium() {
   clearInterval(tickTimer);
   livePodiumVisible = false;
@@ -920,28 +932,134 @@ function renderHostPodium() {
     var stage = document.getElementById("host-podium");
     stage.innerHTML = "";
 
+    // Criar container do pódio cinematográfico
+    var cinematic = document.createElement("div");
+    cinematic.className = "podium-cinematic";
+    cinematic.id = "podium-cinematic";
+    stage.appendChild(cinematic);
+
+    // Criar lista completa (inicialmente escondida)
+    var fullList = document.createElement("div");
+    fullList.className = "podium-full-list";
+    fullList.id = "podium-full-list";
+    fullList.style.display = "none";
+    stage.appendChild(fullList);
+
+    podiumItems = items;
+    podiumRevealIndex = items.length - 1;
+
+    // Iniciar sequência de suspense
+    setTimeout(function() {
+      revealCinematicPodiumStep();
+    }, 600);
+  });
+}
+
+function revealCinematicPodiumStep() {
+  var cinematic = document.getElementById("podium-cinematic");
+  if (!cinematic) return;
+
+  if (podiumRevealIndex < 0) {
+    // Todos revelados — mostrar lista completa
+    setTimeout(function() {
+      showFullPodiumList();
+    }, 1200);
+    return;
+  }
+
+  var p = podiumItems[podiumRevealIndex];
+  var rank = podiumRevealIndex + 1;
+  var isTop3 = podiumRevealIndex < 3;
+  var isWinner = podiumRevealIndex === 0;
+
+  var avIdx = AVATAR_DATA.findIndex(function(d) { return d.name === p.avatar; });
+  var safeIdx = avIdx >= 0 ? avIdx : 0;
+  var avUrl = getAvatarUrl(safeIdx, 120);
+  var fallback = getFallbackAvatar(safeIdx, 120);
+
+  var medals = ["🥇", "🥈", "🥉"];
+  var flowers = ["🌻", "🌼", "🌸"];
+  var medal = isTop3 ? medals[podiumRevealIndex] : "";
+  var flower = isTop3 ? flowers[podiumRevealIndex] : "🌱";
+  var positionLabels = ["Primeiro Lugar", "Segundo Lugar", "Terceiro Lugar"];
+  var positionLabel = isTop3 ? positionLabels[podiumRevealIndex] : (rank + "º Lugar");
+
+  // Montar card de spotlight
+  var card = document.createElement("div");
+  card.className = "podium-spotlight-card";
+  card.id = "spotlight-card-" + podiumRevealIndex;
+
+  var topClass = isTop3 ? (podiumRevealIndex === 0 ? "spotlight-gold" : podiumRevealIndex === 1 ? "spotlight-silver" : "spotlight-bronze") : "";
+
+  card.innerHTML =
+    '<div class="spotlight-rank-label ' + topClass + '">' + positionLabel + '</div>' +
+    '<div class="spotlight-avatar-wrap">' +
+      '<img class="spotlight-avatar" src="' + avUrl + '" alt="' + escapeHtml(p.name) + '" ' +
+      'onerror="this.src=\'' + fallback + '\'">' +
+      (isWinner ? '<div class="spotlight-crown">👑</div>' : '') +
+    '</div>' +
+    '<div class="spotlight-name">' + escapeHtml(p.name) + '</div>' +
+    '<div class="spotlight-score">' + (p.score || 0) + ' pontos</div>' +
+    (p.bestStreak > 2 ? '<div class="spotlight-streak">🔥 Série de ' + p.bestStreak + ' acertos</div>' : '') +
+    '<div class="spotlight-medal">' + (isTop3 ? medal + " " + flower : flower) + '</div>';
+
+  // Limpar spotlight anterior
+  cinematic.innerHTML = "";
+  cinematic.appendChild(card);
+
+  // Animação de entrada
+  requestAnimationFrame(function() {
+    card.classList.add("spotlight-in");
+  });
+
+  // Som apropriado
+  if (isWinner) {
+    sfxWinner();
+    spawnConfetti();
+    spawnGoldRain();
+  } else if (isTop3) {
+    sfxSpotlight();
+  } else {
+    sfxReveal();
+  }
+
+  // Próximo após delay dramático
+  podiumRevealIndex--;
+  var delay = isWinner ? 3000 : (podiumRevealIndex >= 2 ? 2200 : 2800);
+  setTimeout(revealCinematicPodiumStep, delay);
+}
+
+function showFullPodiumList() {
+  var cinematic = document.getElementById("podium-cinematic");
+  var fullList = document.getElementById("podium-full-list");
+  if (!cinematic || !fullList) return;
+
+  // Fade out do spotlight
+  cinematic.style.transition = "opacity 0.8s ease";
+  cinematic.style.opacity = "0";
+
+  setTimeout(function() {
+    cinematic.style.display = "none";
+    fullList.style.display = "flex";
+
     var medals = ["🥇", "🥈", "🥉"];
     var flowers = ["🌻", "🌼", "🌸"];
 
-    for (var idx = 0; idx < items.length; idx++) {
-      var p = items[idx];
-      var isTop3 = idx < 3;
-      var rank = idx + 1;
-      var medal = isTop3 ? medals[idx] : "";
-      var flower = isTop3 ? flowers[idx] : "🌱";
+    var html = "";
+    for (var i = 0; i < podiumItems.length; i++) {
+      var p = podiumItems[i];
+      var isTop3 = i < 3;
       var avIdx = AVATAR_DATA.findIndex(function(d) { return d.name === p.avatar; });
       var safeIdx = avIdx >= 0 ? avIdx : 0;
-      var avUrl = getAvatarUrl(safeIdx, 56);
-      var fallback = getFallbackAvatar(safeIdx, 56);
-      var topClass = isTop3 ? (idx === 0 ? "top-1" : idx === 1 ? "top-2" : "top-3") : "";
+      var avUrl = getAvatarUrl(safeIdx, 52);
+      var fallback = getFallbackAvatar(safeIdx, 52);
+      var topClass = isTop3 ? (i === 0 ? "top-1" : i === 1 ? "top-2" : "top-3") : "";
+      var medal = isTop3 ? medals[i] : "";
+      var flower = isTop3 ? flowers[i] : "🌱";
 
-      var step = document.createElement("div");
-      step.className = "podium-step " + topClass;
-      step.id = "podium-step-" + idx;
-      step.innerHTML =
-        '<div class="step-rank">#' + rank + '</div>' +
+      html += '<div class="podium-step ' + topClass + '" style="animation-delay:' + (i * 0.06) + 's">' +
+        '<div class="step-rank">#' + (i + 1) + '</div>' +
         '<img class="step-av" src="' + avUrl + '" alt="' + escapeHtml(p.name) + '" ' +
-        'style="border-radius:50%;width:52px;height:52px;object-fit:cover;" ' +
         'onerror="this.src=\'' + fallback + '\'">' +
         '<div class="step-info">' +
           '<div class="step-name">' + escapeHtml(p.name) + '</div>' +
@@ -949,74 +1067,33 @@ function renderHostPodium() {
         '</div>' +
         '<div class="step-medal">' + (isTop3 ? medal + flower : "") + '</div>' +
         '<div class="step-bar-bg"></div>' +
-        '<div class="step-bar-fill"></div>';
-      stage.appendChild(step);
+        '<div class="step-bar-fill"></div>' +
+      '</div>';
     }
+    fullList.innerHTML = html;
 
-    var rl = document.getElementById("host-ranklist");
-    var rlHtml = "";
-    for (var i = 0; i < items.length; i++) {
-      var p = items[i];
-      var avIdx2 = AVATAR_DATA.findIndex(function(d) { return d.name === p.avatar; });
-      var safeIdx2 = avIdx2 >= 0 ? avIdx2 : 0;
-      var avUrl2 = getAvatarUrl(safeIdx2, 28);
-      var fallback2 = getFallbackAvatar(safeIdx2, 28);
-      rlHtml += '<div class="rank-row" style="animation-delay:' + (i * 0.08) + 's">' +
-        '<span class="rn">' + (i + 1) + '</span>' +
-        '<img src="' + avUrl2 + '" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt="" ' +
-        'onerror="this.src=\'' + fallback2 + '\'">' +
-        '<span>' + escapeHtml(p.name) + '</span>' +
-        '<span class="rs">' + (p.score || 0) + ' pts</span></div>';
-    }
-    rl.innerHTML = rlHtml;
-
-    podiumItems = items;
-    podiumRevealIndex = items.length - 1;
-    sfxDrumRoll();
-    setTimeout(revealNextPodiumStep, 800);
-  });
-}
-
-function revealNextPodiumStep() {
-  if (podiumRevealIndex < 0) {
+    // Animar barras
     setTimeout(function() {
-      var winnerStep = document.getElementById("podium-step-0");
-      if (winnerStep) {
-        winnerStep.classList.add("winner-glow");
-        winnerStep.classList.add("crowned");
-        sfxWinner();
-        spawnConfetti();
-        spawnGoldRain();
-        setTimeout(function(){ spawnConfetti(); spawnGoldRain(); }, 400);
-        setTimeout(function(){ spawnConfetti(); spawnGoldRain(); }, 900);
+      var maxScore = 1;
+      for (var j = 0; j < podiumItems.length; j++) {
+        maxScore = Math.max(maxScore, podiumItems[j].score || 0);
       }
-    }, 800);
-    return;
-  }
-
-  var step = document.getElementById("podium-step-" + podiumRevealIndex);
-  if (step) {
-    step.classList.add("revealed");
-    sfxReveal();
-
-    setTimeout(function() {
-      var bar = step.querySelector(".step-bar-fill");
-      if (bar) {
-        var maxScore = 1;
-        for (var i = 0; i < podiumItems.length; i++) {
-          maxScore = Math.max(maxScore, podiumItems[i].score || 0);
+      var steps = fullList.querySelectorAll(".podium-step");
+      steps.forEach(function(step, idx) {
+        var bar = step.querySelector(".step-bar-fill");
+        var bgBar = step.querySelector(".step-bar-bg");
+        if (bar) {
+          var pct = ((podiumItems[idx].score || 0) / maxScore) * 100;
+          bar.style.width = pct + "%";
         }
-        var pct = ((podiumItems[podiumRevealIndex].score || 0) / maxScore) * 100;
-        bar.style.width = pct + "%";
-      }
-      var bgBar = step.querySelector(".step-bar-bg");
-      if (bgBar) bgBar.style.width = "100%";
-    }, 150);
-  }
+        if (bgBar) bgBar.style.width = "100%";
+      });
+    }, 300);
 
-  podiumRevealIndex--;
-  var delay = podiumRevealIndex >= 2 ? 700 : 1100;
-  setTimeout(revealNextPodiumStep, delay);
+    sfxWinner();
+    spawnConfetti();
+    spawnGoldRain();
+  }, 900);
 }
 
 /* ===== PLAYER FLOW ===== */
@@ -1149,6 +1226,7 @@ function handlePlayerMetaChange(meta) {
     lastSeenStatus = "question";
     lastSeenQIndex = meta.qIndex;
     hasAnsweredThisQ = false;
+    myLastAnswer = null; // FIX: reset resposta local
     renderPlayerQuestion();
     show("screen-player-question");
   } else if (meta.status === "reveal" && lastSeenStatus !== "reveal") {
@@ -1246,6 +1324,13 @@ setInterval(function() {
 function playerAnswer(idx) {
   if (hasAnsweredThisQ) return;
   hasAnsweredThisQ = true;
+
+  // FIX: guardar resposta localmente imediatamente
+  myLastAnswer = {
+    choice: idx,
+    at: Date.now()
+  };
+
   var opts = document.querySelectorAll("#player-opts .opt");
   opts.forEach(function(opt, i) {
     opt.classList.remove("clickable");
@@ -1267,7 +1352,22 @@ function renderPlayerReveal() {
   ]).then(function(results) {
     var myAns = results[0].val();
     var p = results[1].val();
-    var isCorrect = myAns && myAns.choice === qd.c;
+
+    // FIX: usar resposta local como fallback se Firebase ainda não persistiu
+    if (!myAns && myLastAnswer && myLastAnswer.choice !== undefined) {
+      myAns = myLastAnswer;
+      console.log('[BROTO] Usando resposta local:', myAns);
+    }
+
+    // FIX: defesa extra — garantir que qd existe
+    if (!qd) {
+      console.error('[BROTO] qd indefinido para qIndex:', localMeta.qIndex);
+      qd = { c: 0, opts: ["","","",""] };
+    }
+
+    var isCorrect = myAns && typeof myAns.choice === 'number' && myAns.choice === qd.c;
+
+    console.log('[BROTO] Render reveal — choice:', myAns ? myAns.choice : 'null', 'correct:', qd.c, 'isCorrect:', isCorrect);
 
     if (isCorrect) {
       myStreak++;
