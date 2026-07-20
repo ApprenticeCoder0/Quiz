@@ -1,5 +1,5 @@
-/* BROTO v5.4 - Quiz Coletivo */
-console.log('[BROTO] App.js carregado v5.4');
+/* BROTO v6.1 - Quiz Coletivo */
+console.log('[BROTO] App.js carregado v6.1');
 
 const firebaseConfig = {
   apiKey: "AIzaSyDEWTmLRXrlKBKBopYwjlgA6MD2833GY54",
@@ -217,6 +217,11 @@ var livePodiumVisible = false;
 var myStreak = 0;
 var myBestStreak = 0;
 var gapUpdatePending = false;
+var hostNextLocked = false;
+/* v6.0 */
+var lastRoundPoints = 0;
+var lastRoundWasCorrect = false;
+var interstitialTimer = null;
 
 /* ===== AUDIO ===== */
 function initAudio() {
@@ -319,6 +324,15 @@ function sfxSpotlight() {
 function sfxSuspense() {
   playTone(110, "sine", 0.80, 0.06);
   setTimeout(function(){ playTone(130, "sine", 0.60, 0.05); }, 400);
+}
+
+function sfxScoreTick() {
+  playTone(880, "sine", 0.04, 0.05);
+}
+
+function sfxSlide() {
+  playTone(330, "sine", 0.12, 0.06);
+  setTimeout(function(){ playTone(440, "sine", 0.12, 0.06); }, 80);
 }
 
 /* ===== FIREBASE INIT ===== */
@@ -447,6 +461,36 @@ function calcPoints(elapsedMs, streak) {
   return { base: base, bonus: Math.round(base * streakBonus), total: total };
 }
 
+/* v6.0 — Animação de contagem de números */
+function animateValue(el, start, end, duration, onDone) {
+  if (start === end) {
+    el.textContent = end;
+    if (onDone) onDone();
+    return;
+  }
+  var range = end - start;
+  var startTime = null;
+  var tickCount = 0;
+  function step(timestamp) {
+    if (!startTime) startTime = timestamp;
+    var progress = Math.min((timestamp - startTime) / duration, 1);
+    var ease = 1 - Math.pow(1 - progress, 4);
+    var current = Math.floor(start + range * ease);
+    if (el.textContent !== String(current)) {
+      el.textContent = current;
+      tickCount++;
+      if (tickCount % 3 === 0) sfxScoreTick();
+    }
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    } else {
+      el.textContent = end;
+      if (onDone) onDone();
+    }
+  }
+  window.requestAnimationFrame(step);
+}
+
 /* ===== PARTICLES & EFFECTS ===== */
 function spawnConfetti() {
   var colors = ["#e07098", "#6abf6a", "#d4b840", "#f0c0d0", "#90e090", "#ff7b7b", "#5ecdc4", "#ffd700", "#ff8c00", "#40e0d0"];
@@ -540,6 +584,20 @@ function spawnParticles() {
   }
 }
 
+/* v6.1 — Estrelas cintilantes para o pódio */
+function spawnStarLights(container, count, color) {
+  for (var i = 0; i < count; i++) {
+    var star = document.createElement("div");
+    star.className = "star-light";
+    star.style.left = (10 + Math.random() * 80) + "%";
+    star.style.top = (5 + Math.random() * 90) + "%";
+    star.style.animationDelay = (Math.random() * 2) + "s";
+    star.style.animationDuration = (1.5 + Math.random() * 1.5) + "s";
+    if (color) star.style.background = color;
+    container.appendChild(star);
+  }
+}
+
 function showCountdown(onComplete) {
   var overlay = document.createElement("div");
   overlay.className = "countdown-overlay";
@@ -616,7 +674,6 @@ function goHostSetup() {
 
   code = roomCode();
 
-  // FIX v5.4: Host gera a ordem das perguntas e opções UMA ÚNICA VEZ
   var totalQs = getTotalQuestions();
   var questionOrder = generateQuestionOrder(totalQs);
   var optionOrders = generateOptionOrders(questionOrder);
@@ -755,7 +812,6 @@ function listenForAnswers() {
 }
 
 function renderHostQuestion() {
-  // FIX v5.4: usar getQuestion com o meta para garantir mesma ordem para todos
   var qd = getQuestion(localMeta.qIndex, localMeta);
   var total = localMeta.total || getTotalQuestions();
   document.getElementById("host-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + total;
@@ -765,15 +821,22 @@ function renderHostQuestion() {
 
   var optsHtml = "";
   for (var i = 0; i < qd.opts.length; i++) {
-    optsHtml += '<div class="opt o' + i + '" id="host-opt-' + i + '">' +
+    optsHtml += '<div class="opt o' + i + '" id="host-opt-' + i + '" style="animation-delay:' + (0.1 + i * 0.08) + 's">' +
       '<span class="mk">' + OPT_MARK[i] + '</span>' +
       '<span>' + qd.opts[i] + '</span></div>';
   }
   document.getElementById("host-opts").innerHTML = optsHtml;
 
   document.getElementById("btn-reveal").style.display = "inline-flex";
-  document.getElementById("btn-next").style.display = "none";
   document.getElementById("host-timerbar").style.width = "100%";
+
+  // v6.0 — animação de entrada na pergunta
+  var qbox = document.querySelector("#screen-host-game .question-box");
+  if (qbox) {
+    qbox.style.animation = "none";
+    void qbox.offsetHeight;
+    qbox.style.animation = "question-enter 0.6s cubic-bezier(0.2,1.4,0.4,1) both";
+  }
 }
 
 function startHostTimerTick() {
@@ -824,14 +887,17 @@ function hostReveal() {
         '<div class="bar-label">' + pct + '%</div>';
     }
 
-    for (var key in answers) {
-      var a = answers[key];
-      if (!a || !a.pid) continue;
-      var isCorrect = a.choice === qd.c;
-      var pRef = dbRef(dbPath("broto", code, "players", a.pid));
-      if (pRef) {
-        pRef.get().then(function(pSnap) {
-          var p = pSnap.val() || {};
+    /* v6.1 FIX — Processa TODOS os jogadores de uma vez (batch) para evitar
+       race condition e closure bug com var no loop */
+    var playersRef = dbRef(dbPath("broto", code, "players"));
+    if (playersRef) {
+      playersRef.get().then(function(playersSnap) {
+        var allPlayers = playersSnap.val() || {};
+        for (var key in answers) {
+          var a = answers[key];
+          if (!a || !a.pid) continue;
+          var p = allPlayers[a.pid] || {};
+          var isCorrect = (a.choice === qd.c);
           var pts = isCorrect ? calcPoints(a.at - localMeta.qStartAt, p.streak || 0).total : 0;
           p.score = (p.score || 0) + pts;
           if (isCorrect) {
@@ -840,17 +906,64 @@ function hostReveal() {
           } else {
             p.streak = 0;
           }
-          pRef.set(p);
+          allPlayers[a.pid] = p;
+        }
+        playersRef.set(allPlayers).then(function() {
+          updateLivePodium();
+          document.getElementById("btn-reveal").style.display = "none";
+
+          // v6.1 — Se for a última pergunta, pula interstitial e vai direto ao podium
+          var totalQs = localMeta.total || getTotalQuestions();
+          var isLastQuestion = (localMeta.qIndex + 1 >= totalQs);
+
+          setTimeout(function() {
+            if (isLastQuestion) {
+              localMeta.status = "podium";
+              var metaRef2 = dbRef(dbPath("broto", code, "meta"));
+              if (metaRef2) {
+                metaRef2.set(localMeta).then(function() {
+                  renderHostPodium();
+                });
+              }
+            } else {
+              localMeta.status = "interstitial";
+              var metaRef2 = dbRef(dbPath("broto", code, "meta"));
+              if (metaRef2) {
+                metaRef2.set(localMeta).then(function() {
+                  renderHostInterstitial();
+                  show("screen-host-interstitial");
+                });
+              }
+            }
+          }, 3000);
         });
-      }
+      });
+    } else {
+      // Fallback se não houver playersRef
+      document.getElementById("btn-reveal").style.display = "none";
+      var totalQs = localMeta.total || getTotalQuestions();
+      var isLastQuestion = (localMeta.qIndex + 1 >= totalQs);
+      setTimeout(function() {
+        if (isLastQuestion) {
+          localMeta.status = "podium";
+          var metaRef2 = dbRef(dbPath("broto", code, "meta"));
+          if (metaRef2) {
+            metaRef2.set(localMeta).then(function() {
+              renderHostPodium();
+            });
+          }
+        } else {
+          localMeta.status = "interstitial";
+          var metaRef2 = dbRef(dbPath("broto", code, "meta"));
+          if (metaRef2) {
+            metaRef2.set(localMeta).then(function() {
+              renderHostInterstitial();
+              show("screen-host-interstitial");
+            });
+          }
+        }
+      }, 3000);
     }
-
-    updateLivePodium();
-
-    document.getElementById("btn-reveal").style.display = "none";
-    document.getElementById("btn-next").style.display = "inline-flex";
-    var totalQs = localMeta.total || getTotalQuestions();
-    document.getElementById("btn-next-text").textContent = (qi + 1 < totalQs) ? "Proxima →" : "Ver podio 🏆";
   }
 
   if (ansRef) {
@@ -860,7 +973,85 @@ function hostReveal() {
   }
 }
 
-function hostNext() {
+/* v6.0 — INTERSTITIAL HOST */
+function renderHostInterstitial() {
+  sfxSlide();
+  var playersRef = dbRef(dbPath("broto", code, "players"));
+  if (!playersRef) return;
+
+  playersRef.get().then(function(snap) {
+    var items = [];
+    var val = snap.val() || {};
+    for (var k in val) if (val[k]) items.push(val[k]);
+    items.sort(function(a, b) { return (b.score || 0) - (a.score || 0); });
+
+    // Maior streak
+    var maxStreak = 0, streakHolder = null;
+    for (var i = 0; i < items.length; i++) {
+      if ((items[i].bestStreak || 0) > maxStreak) {
+        maxStreak = items[i].bestStreak;
+        streakHolder = items[i];
+      }
+    }
+
+    var streakEl = document.getElementById("host-interstitial-streak");
+    if (streakEl) {
+      if (maxStreak >= 2 && streakHolder) {
+        streakEl.innerHTML = '<div class="streak-banner-host">' +
+          '<span class="streak-flame">🔥</span>' +
+          '<span>Maior sequência: <strong>' + escapeHtml(streakHolder.name) + '</strong> — ' + maxStreak + ' acertos!</span>' +
+          '</div>';
+        streakEl.style.display = "block";
+      } else {
+        streakEl.style.display = "none";
+      }
+    }
+
+    // Render top 8
+    var html = "";
+    var maxScore = Math.max(1, items[0] ? items[0].score || 0 : 0);
+    for (var i = 0; i < Math.min(items.length, 8); i++) {
+      var p = items[i];
+      var avIdx = AVATAR_DATA.findIndex(function(d) { return d.name === p.avatar; });
+      var safeIdx = avIdx >= 0 ? avIdx : 0;
+      var avUrl = getAvatarUrl(safeIdx, 56);
+      var fallback = getFallbackAvatar(safeIdx, 56);
+      var pct = ((p.score || 0) / maxScore) * 100;
+      var medals = ["🥇", "🥈", "🥉"];
+      var medal = i < 3 ? medals[i] : "";
+      var topClass = i < 3 ? " is-top" + (i+1) : "";
+
+      html += '<div class="interstitial-row' + topClass + '" style="animation-delay:' + (i * 0.08) + 's">' +
+        '<span class="is-rank">' + (i + 1) + '</span>' +
+        '<img class="is-av" src="' + avUrl + '" alt="" onerror="this.src=\'' + fallback + '\'">' +
+        '<div class="is-info">' +
+          '<div class="is-name">' + escapeHtml(p.name) + ' <span class="is-medal">' + medal + '</span></div>' +
+          '<div class="is-bar-bg"><div class="is-bar-fill" style="width:0%" data-width="' + pct + '%"></div></div>' +
+        '</div>' +
+        '<div class="is-score" data-target="' + (p.score || 0) + '">0</div>' +
+      '</div>';
+    }
+
+    document.getElementById("host-interstitial-podium").innerHTML = html;
+
+    // Anima barras e scores
+    setTimeout(function() {
+      var bars = document.querySelectorAll("#host-interstitial-podium .is-bar-fill");
+      bars.forEach(function(bar) {
+        bar.style.width = bar.dataset.width;
+      });
+      var scores = document.querySelectorAll("#host-interstitial-podium .is-score");
+      scores.forEach(function(sc) {
+        animateValue(sc, 0, parseInt(sc.dataset.target), 1200);
+      });
+    }, 100);
+  });
+}
+
+function hostNextFromInterstitial() {
+  if (hostNextLocked) return;
+  hostNextLocked = true;
+
   var totalQs = localMeta.total || getTotalQuestions();
   if (localMeta.qIndex + 1 < totalQs) {
     localMeta.qIndex += 1;
@@ -870,16 +1061,24 @@ function hostNext() {
     if (metaRef) {
       metaRef.set(localMeta).then(function() {
         renderHostQuestion();
+        show("screen-host-game");
         startHostTimerTick();
         listenForAnswers();
         updateLivePodium();
+        hostNextLocked = false;
+      }).catch(function(err) {
+        console.error('[BROTO] Erro ao avançar pergunta:', err);
+        hostNextLocked = false;
       });
+    } else {
+      hostNextLocked = false;
     }
   } else {
     localMeta.status = "podium";
     var metaRef = dbRef(dbPath("broto", code, "meta"));
     if (metaRef) metaRef.set(localMeta);
     renderHostPodium();
+    hostNextLocked = false;
   }
 }
 
@@ -923,7 +1122,7 @@ function updateLivePodium() {
   });
 }
 
-/* ===== FINAL PODIUM — CINEMATOGRÁFICO v5.4 ===== */
+/* ===== FINAL PODIUM ===== */
 function renderHostPodium() {
   clearInterval(tickTimer);
   livePodiumVisible = false;
@@ -1013,6 +1212,18 @@ function revealCinematicPodiumStep() {
   cinematic.innerHTML = "";
   cinematic.appendChild(card);
 
+  /* v6.1 — Efeitos de luz para top 3 */
+  if (isTop3) {
+    var starColor = podiumRevealIndex === 0 ? "#ffd700" : podiumRevealIndex === 1 ? "#c0c0c0" : "#cd8c46";
+    var starCount = podiumRevealIndex === 0 ? 18 : podiumRevealIndex === 1 ? 12 : 8;
+    spawnStarLights(card, starCount, starColor);
+  }
+  if (isWinner) {
+    var mysteryGlow = document.createElement("div");
+    mysteryGlow.className = "mystery-glow";
+    card.appendChild(mysteryGlow);
+  }
+
   requestAnimationFrame(function() {
     card.classList.add("spotlight-in");
   });
@@ -1028,7 +1239,7 @@ function revealCinematicPodiumStep() {
   }
 
   podiumRevealIndex--;
-  var delay = isWinner ? 3000 : (podiumRevealIndex >= 2 ? 2200 : 2800);
+  var delay = isWinner ? 3500 : (podiumRevealIndex >= 2 ? 2200 : 2800);
   setTimeout(revealCinematicPodiumStep, delay);
 }
 
@@ -1232,42 +1443,81 @@ function handlePlayerMetaChange(meta) {
     show("screen-player-question");
   } else if (meta.status === "reveal" && lastSeenStatus !== "reveal") {
     lastSeenStatus = "reveal";
-    renderPlayerReveal().then(function() { show("screen-player-reveal"); });
+    renderPlayerReveal().then(function() {
+      if (localMeta && localMeta.status === "reveal") {
+        show("screen-player-reveal");
+      }
+    });
+  } else if (meta.status === "interstitial" && lastSeenStatus !== "interstitial") {
+    lastSeenStatus = "interstitial";
+    renderPlayerInterstitial().then(function() {
+      if (localMeta && localMeta.status === "interstitial") {
+        show("screen-player-interstitial");
+      }
+    });
   } else if (meta.status === "podium" && lastSeenStatus !== "podium") {
     lastSeenStatus = "podium";
-    renderPlayerPodium().then(function() { show("screen-player-podium"); });
+    renderPlayerPodium().then(function() {
+      if (localMeta && localMeta.status === "podium") {
+        show("screen-player-podium");
+      }
+    });
   } else if (meta.status === "question" && document.getElementById("screen-player-question").classList.contains("active")) {
     updatePlayerTimer();
   }
 }
 
-function renderPlayerQuestion() {
-  initAudio();
-  // FIX v5.4: usar getQuestion com o meta para mesma ordem do host
-  var qd = getQuestion(localMeta.qIndex, localMeta);
-  var total = localMeta.total || getTotalQuestions();
-  document.getElementById("player-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + total;
-  document.getElementById("player-qtext").textContent = qd.q;
-  document.getElementById("player-answer-status").textContent = "";
-
+function updateStreakBadge() {
   var streakBadge = document.getElementById("player-streak-badge");
   var streakText = document.getElementById("player-streak-text");
+  if (!streakBadge || !streakText) return;
   if (myStreak >= 2) {
     streakBadge.style.display = "inline-flex";
     streakText.textContent = "Serie x" + myStreak + " 🔥";
   } else {
     streakBadge.style.display = "none";
   }
+}
+
+function renderPlayerQuestion() {
+  initAudio();
+  var qd = getQuestion(localMeta.qIndex, localMeta);
+  var total = localMeta.total || getTotalQuestions();
+  document.getElementById("player-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + total;
+  document.getElementById("player-qtext").textContent = qd.q;
+  document.getElementById("player-answer-status").textContent = "";
+
+  // Sincronizar streak com o servidor (crucial após refresh ou reconexão)
+  var pRef = dbRef(dbPath("broto", code, "players", myPid));
+  if (pRef) {
+    pRef.get().then(function(snap) {
+      var p = snap.val();
+      if (p) {
+        myStreak = p.streak || 0;
+        myBestStreak = p.bestStreak || 0;
+        updateStreakBadge();
+      }
+    });
+  }
+  updateStreakBadge();
 
   var optsHtml = "";
   for (var i = 0; i < qd.opts.length; i++) {
-    optsHtml += '<div class="opt o' + i + ' clickable" id="player-opt-' + i + '" onclick="playerAnswer(' + i + ')">' +
+    optsHtml += '<div class="opt o' + i + ' clickable" id="player-opt-' + i + '" onclick="playerAnswer(' + i + ')" style="animation-delay:' + (0.15 + i * 0.1) + 's">' +
       '<span class="mk">' + OPT_MARK[i] + '</span>' +
       '<span>' + qd.opts[i] + '</span></div>';
   }
   document.getElementById("player-opts").innerHTML = optsHtml;
   updatePlayerTimer();
   updatePlayerGap();
+
+  // v6.0 — animação de entrada
+  var qbox = document.querySelector("#screen-player-question .question-box");
+  if (qbox) {
+    qbox.style.animation = "none";
+    void qbox.offsetHeight;
+    qbox.style.animation = "question-enter 0.6s cubic-bezier(0.2,1.4,0.4,1) both";
+  }
 }
 
 function updatePlayerTimer() {
@@ -1344,7 +1594,6 @@ function playerAnswer(idx) {
 }
 
 function renderPlayerReveal() {
-  // FIX v5.4: usar getQuestion com o meta para mesma ordem do host
   var qd = getQuestion(localMeta.qIndex, localMeta);
   var ansRef = dbRef(dbPath("broto", code, "answers", localMeta.qIndex, myPid));
   var pRef = dbRef(dbPath("broto", code, "players", myPid));
@@ -1367,6 +1616,7 @@ function renderPlayerReveal() {
     }
 
     var isCorrect = myAns && typeof myAns.choice === 'number' && myAns.choice === qd.c;
+    lastRoundWasCorrect = isCorrect;
 
     console.log('[BROTO] Render reveal — choice:', myAns ? myAns.choice : 'null', 'correct:', qd.c, 'isCorrect:', isCorrect);
 
@@ -1377,6 +1627,9 @@ function renderPlayerReveal() {
     } else {
       myStreak = 0;
     }
+
+    var pts = isCorrect ? calcPoints(myAns.at - localMeta.qStartAt, myStreak) : { base: 0, bonus: 0, total: 0 };
+    lastRoundPoints = pts.total;
 
     var banner = document.getElementById("player-reveal-banner");
     banner.className = "reveal-banner " + (isCorrect ? "ok" : "no");
@@ -1391,7 +1644,6 @@ function renderPlayerReveal() {
       sfxWrong();
     }
 
-    var pts = isCorrect ? calcPoints(myAns.at - localMeta.qStartAt, myStreak) : { base: 0, bonus: 0, total: 0 };
     var ptsText = isCorrect
       ? ("+" + pts.total + " pontos" + (pts.bonus > 0 ? " (" + pts.base + " + 🔥" + pts.bonus + ")" : ""))
       : "";
@@ -1432,6 +1684,129 @@ function renderPlayerReveal() {
     } else {
       gapRevealEl.style.display = "none";
     }
+  });
+}
+
+/* v6.0 — INTERSTITIAL PLAYER */
+function renderPlayerInterstitial() {
+  return dbRef(dbPath("broto", code, "players")).get().then(function(snap) {
+    var items = [];
+    var val = snap.val() || {};
+    for (var k in val) if (val[k]) items.push(val[k]);
+    items.sort(function(a, b) { return (b.score || 0) - (a.score || 0); });
+
+    var myRank = -1, me = null;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].pid === myPid) { myRank = i + 1; me = items[i]; }
+    }
+
+    // Rank display
+    var rankEl = document.getElementById("player-interstitial-rank");
+    if (myRank > 0) {
+      rankEl.innerHTML = '<div class="big-rank">#' + myRank + '</div><div class="big-rank-label">de ' + items.length + ' jogadores</div>';
+    } else {
+      rankEl.innerHTML = '<div class="big-rank">#?</div>';
+    }
+
+    // Score animation
+    var scoreEl = document.getElementById("player-interstitial-score");
+    var currentScore = me ? me.score || 0 : 0;
+    scoreEl.innerHTML = '<span class="score-number">0</span>';
+    setTimeout(function() {
+      var numEl = scoreEl.querySelector(".score-number");
+      if (numEl) animateValue(numEl, 0, currentScore, 1500);
+    }, 200);
+
+    // Points gained this round
+    if (lastRoundWasCorrect && lastRoundPoints > 0) {
+      scoreEl.innerHTML += '<div class="points-gained">+' + lastRoundPoints + ' pts nesta rodada</div>';
+    }
+
+    // Gap info
+    var gapEl = document.getElementById("player-interstitial-gap");
+    if (myRank > 1 && items[myRank - 2]) {
+      var ahead = items[myRank - 2];
+      var gap = (ahead.score || 0) - (me.score || 0);
+      gapEl.innerHTML = '<span class="gap-behind">📍 Você está a <strong>' + gap + ' pts</strong> de ' + escapeHtml(ahead.name) + ' (' + (myRank - 1) + 'º)</span>';
+      gapEl.style.display = "block";
+    } else if (myRank === 1 && items[1]) {
+      var lead = (me.score || 0) - (items[1].score || 0);
+      gapEl.innerHTML = '<span class="gap-ahead">👑 Liderando por <strong>' + lead + ' pts</strong></span>';
+      gapEl.style.display = "block";
+    } else {
+      gapEl.style.display = "none";
+    }
+
+    // Streak
+    var streakEl = document.getElementById("player-interstitial-streak");
+    var maxStreak = 0, streakHolder = null;
+    for (var i = 0; i < items.length; i++) {
+      if ((items[i].bestStreak || 0) > maxStreak) {
+        maxStreak = items[i].bestStreak;
+        streakHolder = items[i];
+      }
+    }
+    if (maxStreak >= 2 && streakHolder) {
+      var isMe = streakHolder.pid === myPid;
+      streakEl.innerHTML = '<div class="streak-banner ' + (isMe ? 'streak-mine' : '') + '">' +
+        '<span class="streak-flame">🔥</span>' +
+        '<span>Maior sequência: <strong>' + escapeHtml(streakHolder.name) + '</strong> — ' + maxStreak + ' acertos!</span>' +
+      '</div>';
+      streakEl.style.display = "block";
+    } else {
+      streakEl.style.display = "none";
+    }
+
+    // Top 8 list
+    var listHtml = "";
+    var maxScore = Math.max(1, items[0] ? items[0].score || 0 : 0);
+    for (var i = 0; i < Math.min(items.length, 8); i++) {
+      var p = items[i];
+      var isMe = p.pid === myPid;
+      var avIdx = AVATAR_DATA.findIndex(function(d) { return d.name === p.avatar; });
+      var safeIdx = avIdx >= 0 ? avIdx : 0;
+      var avUrl = getAvatarUrl(safeIdx, 40);
+      var fallback = getFallbackAvatar(safeIdx, 40);
+      var pct = ((p.score || 0) / maxScore) * 100;
+      var highlight = isMe ? ' is-me' : '';
+      var medals = ["🥇", "🥈", "🥉"];
+      var medal = i < 3 ? medals[i] : "";
+
+      listHtml += '<div class="is-row-player' + highlight + '" style="animation-delay:' + (i * 0.06) + 's">' +
+        '<span class="is-rank-p">' + (i + 1) + '</span>' +
+        '<img src="' + avUrl + '" alt="" onerror="this.src=\'' + fallback + '\'">' +
+        '<span class="is-name-p">' + escapeHtml(p.name) + ' ' + medal + '</span>' +
+        '<span class="is-score-p">' + (p.score || 0) + '</span>' +
+        '<div class="is-bar-p"><div style="width:0%" data-width="' + pct + '%"></div></div>' +
+      '</div>';
+    }
+
+    // If player is not in top 8, add separator and show them
+    if (myRank > 8 && me) {
+      listHtml += '<div class="is-separator" style="animation-delay:0.5s">···</div>';
+      var avIdx = AVATAR_DATA.findIndex(function(d) { return d.name === me.avatar; });
+      var safeIdx = avIdx >= 0 ? avIdx : 0;
+      var avUrl = getAvatarUrl(safeIdx, 40);
+      var fallback = getFallbackAvatar(safeIdx, 40);
+      var pct = ((me.score || 0) / maxScore) * 100;
+      listHtml += '<div class="is-row-player is-me" style="animation-delay:0.55s">' +
+        '<span class="is-rank-p">' + myRank + '</span>' +
+        '<img src="' + avUrl + '" alt="" onerror="this.src=\'' + fallback + '\'">' +
+        '<span class="is-name-p">' + escapeHtml(me.name) + '</span>' +
+        '<span class="is-score-p">' + (me.score || 0) + '</span>' +
+        '<div class="is-bar-p"><div style="width:0%" data-width="' + pct + '%"></div></div>' +
+      '</div>';
+    }
+
+    document.getElementById("player-interstitial-list").innerHTML = listHtml;
+
+    // Animate bars
+    setTimeout(function() {
+      var bars = document.querySelectorAll("#player-interstitial-list .is-bar-p div");
+      bars.forEach(function(bar) {
+        if (bar.dataset.width) bar.style.width = bar.dataset.width;
+      });
+    }, 200);
   });
 }
 
@@ -1490,7 +1865,7 @@ function renderPlayerPodium() {
 
 /* ===== BOOT ===== */
 (function boot() {
-  console.log('[BROTO] Boot iniciado');
+  console.log('[BROTO] Boot iniciado v6.1');
   var params = new URLSearchParams(location.search);
   var preCode = params.get("code");
   if (preCode && /^\d{6}$/.test(preCode)) {

@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0a1810">
-<meta name="description" content="BROTO v5.4 - Quiz Coletivo sobre Ética Ambiental e Ecofeminismo">
-<title>BROTO - Quiz Coletivo</title>
+<meta name="description" content="BROTO v6.2 - Quiz Coletivo sobre Ética Ambiental e Ecofeminismo">
+<title>BROTO v6.2 - Quiz Coletivo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=5.4">
+<link rel="stylesheet" href="style.css?v=6.1">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -87,7 +87,7 @@
     </div>
 
     <div class="floating-leaves" id="floating-leaves"></div>
-    <div class="foot">BROTO v5.4 — Quiz Coletivo</div>
+    <div class="foot">BROTO v6.2 — Quiz Coletivo</div>
   </div>
 
   <!-- ═════════════════ HOST: SETUP ═════════════════ -->
@@ -160,9 +160,6 @@
       <button class="btn btn-gold" id="btn-reveal" onclick="hostReveal()">
         <span>🔎</span> Revelar Resposta
       </button>
-      <button class="btn btn-primary" id="btn-next" style="display:none;" onclick="hostNext()">
-        <span id="btn-next-text">Próxima →</span>
-      </button>
     </div>
 
     <div class="live-podium" id="live-podium" style="display:none;">
@@ -171,6 +168,21 @@
         <span class="live-podium-title">Pódio ao Vivo</span>
       </div>
       <div id="live-podium-content"></div>
+    </div>
+  </div>
+
+  <!-- ═════════════════ HOST: INTERSTITIAL ═════════════════ -->
+  <div class="screen" id="screen-host-interstitial">
+    <div class="interstitial-header">
+      <div class="eyebrow">Placar Parcial</div>
+      <h2>Classificação</h2>
+    </div>
+    <div class="interstitial-streak" id="host-interstitial-streak"></div>
+    <div class="interstitial-podium" id="host-interstitial-podium"></div>
+    <div class="host-controls">
+      <button class="btn btn-primary btn-large" id="btn-next-from-interstitial" onclick="hostNextFromInterstitial()">
+        <span>🌿</span> Próxima Pergunta
+      </button>
     </div>
   </div>
 
@@ -315,6 +327,22 @@
     </div>
   </div>
 
+  <!-- ═════════════════ PLAYER: INTERSTITIAL ═════════════════ -->
+  <div class="screen" id="screen-player-interstitial">
+    <div class="interstitial-card">
+      <div class="eyebrow">Placar Parcial</div>
+      <div class="interstitial-rank" id="player-interstitial-rank"></div>
+      <div class="interstitial-score-animate" id="player-interstitial-score"></div>
+      <div class="interstitial-gap" id="player-interstitial-gap"></div>
+      <div class="interstitial-streak-player" id="player-interstitial-streak"></div>
+      <div class="interstitial-list" id="player-interstitial-list"></div>
+      <div class="interstitial-waiting">
+        <span class="pulse-dot"></span>
+        <span>Aguarde a próxima pergunta...</span>
+      </div>
+    </div>
+  </div>
+
   <!-- ═════════════════ PLAYER: PODIUM ═════════════════ -->
   <div class="screen" id="screen-player-podium">
     <div class="player-podium-header">
@@ -334,7 +362,7 @@
 </div>
 
 <!-- Scripts -->
-<script src="questions.js?v=5.4"></script>
-<script src="app.js?v=5.4"></script>
+<script src="questions.js?v=6.1"></script>
+<script src="app.js?v=6.1"></script>
 </body>
 </html>
