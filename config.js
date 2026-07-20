@@ -1,8 +1,11 @@
 /* ============================================================
-   BROTO v6.2 — Configuração Firebase
-   ⚠️  ATENÇÃO: Esta chave é pública por design do Firebase.
+   BROTO v6.2 — Configuração Firebase (separada do app.js)
+
+   Este arquivo contém as credenciais públicas do Firebase.
    A segurança real vem das FIREBASE SECURITY RULES no console.
-   Nunca armazene dados sensíveis (senhas, tokens secretos) aqui.
+
+   Se este arquivo não for carregado, o app.js cai automaticamente
+   em modo demo sem quebrar.
    ============================================================ */
 
 const firebaseConfig = {

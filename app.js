@@ -1,7 +1,7 @@
 /* BROTO v6.1 - Quiz Coletivo */
 console.log('[BROTO] App.js carregado v6.1');
 
-/* firebaseConfig carregado de config.js */
+/* firebaseConfig é definida em config.js (carregada antes deste arquivo) */
 
 const AVATAR_DATA = [
   {name:"Chico Mendes", seed:"chico-mendes", icon:"🌳", grad:["#2d5a3d","#5a9e6e"]},
@@ -330,7 +330,9 @@ function sfxSlide() {
 /* ===== FIREBASE INIT ===== */
 function initFirebase() {
   try {
-    if (firebaseConfig.apiKey.indexOf("XXXX") === -1 && typeof firebase !== 'undefined' && firebase.initializeApp) {
+    // v6.2: firebaseConfig vem de config.js (carregado antes).
+    // Se não estiver definida, cai em demo mode sem quebrar.
+    if (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey && firebaseConfig.apiKey.indexOf("XXXX") === -1 && typeof firebase !== 'undefined' && firebase.initializeApp) {
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
       updateConnStatus(true);
