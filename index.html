@@ -128,7 +128,12 @@
       </div>
     </div>
 
-    <div class="host-controls">
+        <div class="host-bot-controls" id="host-bot-controls">
+      <button class="btn btn-ghost btn-sm" onclick="addBots(1)">+1 Bot 🤖</button>
+      <button class="btn btn-ghost btn-sm" onclick="addBots(5)">+5 Bots 🤖</button>
+      <button class="btn btn-ghost btn-sm" onclick="clearBots()">Limpar Bots ✕</button>
+    </div>
+<div class="host-controls">
       <button class="btn btn-primary btn-large" id="btn-start-game" onclick="hostStartGame()" disabled>
         <span>🌻</span> Iniciar Quiz
       </button>
@@ -157,6 +162,7 @@
     <div class="opts-grid opts-grid--host" id="host-opts"></div>
 
     <div class="host-controls">
+            <button class="btn btn-ghost btn-sm" id="btn-toggle-podium" onclick="toggleLivePodium()">🙈 Ocultar Rank</button>
       <button class="btn btn-gold" id="btn-reveal" onclick="hostReveal()">
         <span>🔎</span> Revelar Resposta
       </button>
@@ -179,7 +185,13 @@
     </div>
     <div class="interstitial-streak" id="host-interstitial-streak"></div>
     <div class="interstitial-podium" id="host-interstitial-podium"></div>
+    <div class="suspense-box" id="host-suspense-box" style="display:none;">
+      <div class="suspense-icon">🔒</div>
+      <div class="suspense-title">Modo Suspense Ativado</div>
+      <div class="suspense-sub">A partir da pergunta 20, as posições ficam ocultas até o pódio final.</div>
+    </div>
     <div class="host-controls">
+            <button class="btn btn-ghost btn-sm" id="btn-toggle-blur" onclick="toggleInterstitialBlur()">🙈 Ocultar Placar</button>
       <button class="btn btn-primary btn-large" id="btn-next-from-interstitial" onclick="hostNextFromInterstitial()">
         <span>🌿</span> Próxima Pergunta
       </button>
@@ -336,6 +348,11 @@
       <div class="interstitial-gap" id="player-interstitial-gap"></div>
       <div class="interstitial-streak-player" id="player-interstitial-streak"></div>
       <div class="interstitial-list" id="player-interstitial-list"></div>
+      <div class="suspense-box" id="player-suspense-box" style="display:none;">
+        <div class="suspense-icon">🔒</div>
+        <div class="suspense-title">Modo Suspense</div>
+        <div class="suspense-sub">As posições estão ocultas até a revelação final.</div>
+      </div>
       <div class="interstitial-waiting">
         <span class="pulse-dot"></span>
         <span>Aguarde a próxima pergunta...</span>
@@ -352,6 +369,16 @@
       <div class="score-badge score-badge--large" id="player-final-score"></div>
     </div>
     <div class="rank-list" id="player-final-list"></div>
+  </div>
+
+  <!-- ═════════════════ PLAYER: KICKED ═════════════════ -->
+  <div class="screen" id="screen-player-kicked">
+    <div class="join-card">
+      <div style="font-size:56px;margin-bottom:14px;">👋</div>
+      <h2>Você foi removido</h2>
+      <p class="subtitle">O apresentador removeu você da sala.</p>
+      <button class="btn btn-secondary" onclick="location.reload()" style="margin-top:18px;">↻ Voltar ao início</button>
+    </div>
   </div>
 
 </div>

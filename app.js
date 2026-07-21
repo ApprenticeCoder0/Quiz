@@ -218,6 +218,10 @@ var myStreak = 0;
 var myBestStreak = 0;
 var gapUpdatePending = false;
 var hostNextLocked = false;
+/* v6.3 */
+var hostBots = {};
+var livePodiumHidden = false;
+var interstitialBlurred = false;
 /* v6.0 */
 var lastRoundPoints = 0;
 var lastRoundWasCorrect = false;
@@ -334,6 +338,119 @@ function sfxSlide() {
   playTone(330, "sine", 0.12, 0.06);
   setTimeout(function(){ playTone(440, "sine", 0.12, 0.06); }, 80);
 }
+
+/* ===== BOT SIMULATOR v6.3 ===== */
+function addBots(n) {
+  for (var i = 0; i < n; i++) {
+    createBotPlayer();
+  }
+  sfxJoin();
+}
+
+function createBotPlayer() {
+  var botNames = ["EcoBot", "VerdeBot", "BrotoBot", "FloraBot", "RaizBot", "SementeBot", "FolhaBot", "PétalaBot", "MossBot", "LíquenBot"];
+  var botName = botNames[Math.floor(Math.random() * botNames.length)] + " " + Math.floor(Math.random() * 999);
+  var botAvatarIdx = Math.floor(Math.random() * AVATARS.length);
+  var botPid = "bot_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  var bot = {
+    pid: botPid,
+    name: botName,
+    avatar: AVATARS[botAvatarIdx].name,
+    avatarUrl: AVATARS[botAvatarIdx].url,
+    avatarPalette: AVATARS[botAvatarIdx].palette,
+    score: 0,
+    streak: 0,
+    bestStreak: 0,
+    joinedAt: Date.now(),
+    isBot: true
+  };
+  hostBots[botPid] = bot;
+  var pRef = dbRef(dbPath("broto", code, "players", botPid));
+  if (pRef) pRef.set(bot);
+}
+
+function scheduleBotAnswers() {
+  if (!localMeta || localMeta.status !== "question") return;
+  var qd = getQuestion(localMeta.qIndex, localMeta);
+  for (var pid in hostBots) {
+    (function(botPid) {
+      if (hostBots[botPid].timer) clearTimeout(hostBots[botPid].timer);
+      var delay = 2000 + Math.random() * (localMeta.duration - 4000);
+      if (delay < 1500) delay = 1500;
+      hostBots[botPid].timer = setTimeout(function() {
+        if (!localMeta || localMeta.status !== "question") return;
+        var ansRef = dbRef(dbPath("broto", code, "answers", localMeta.qIndex, botPid));
+        if (ansRef) {
+          var choice = Math.random() < 0.72 ? qd.c : Math.floor(Math.random() * qd.opts.length);
+          ansRef.set({ pid: botPid, choice: choice, at: Date.now() });
+        }
+      }, delay);
+    })(pid);
+  }
+}
+
+function clearBotTimers() {
+  for (var pid in hostBots) {
+    if (hostBots[pid].timer) {
+      clearTimeout(hostBots[pid].timer);
+      hostBots[pid].timer = null;
+    }
+  }
+}
+
+function clearBots() {
+  for (var pid in hostBots) {
+    var pRef = dbRef(dbPath("broto", code, "players", pid));
+    if (pRef) pRef.set(null);
+    if (hostBots[pid].timer) clearTimeout(hostBots[pid].timer);
+  }
+  hostBots = {};
+}
+
+function kickPlayer(pid) {
+  if (!code || !pid) return;
+  if (hostBots[pid]) {
+    if (hostBots[pid].timer) clearTimeout(hostBots[pid].timer);
+    delete hostBots[pid];
+  }
+  var pRef = dbRef(dbPath("broto", code, "players", pid));
+  if (pRef) pRef.set(null);
+}
+
+/* ===== PRIVACIDADE DO PLACAR v6.3 ===== */
+function toggleLivePodium() {
+  livePodiumHidden = !livePodiumHidden;
+  var lp = document.getElementById("live-podium");
+  var btn = document.getElementById("btn-toggle-podium");
+  if (lp) {
+    if (livePodiumHidden) lp.classList.add("hidden");
+    else lp.classList.remove("hidden");
+  }
+  if (btn) {
+    btn.textContent = livePodiumHidden ? "👁️ Mostrar Rank" : "🙈 Ocultar Rank";
+  }
+  localMeta.hideLivePodium = livePodiumHidden;
+  var metaRef = dbRef(dbPath("broto", code, "meta"));
+  if (metaRef) metaRef.set(localMeta);
+}
+
+function toggleInterstitialBlur() {
+  interstitialBlurred = !interstitialBlurred;
+  var screen = document.getElementById("screen-host-interstitial");
+  var btn = document.getElementById("btn-toggle-blur");
+  if (screen) {
+    if (interstitialBlurred) screen.classList.add("blur-mode");
+    else screen.classList.remove("blur-mode");
+  }
+  if (btn) {
+    btn.textContent = interstitialBlurred ? "👁️ Mostrar Placar" : "🙈 Ocultar Placar";
+  }
+}
+
+function isSuspenseMode() {
+  return localMeta && localMeta.qIndex >= 19;
+}
+
 
 /* ===== FIREBASE INIT ===== */
 function initFirebase() {
@@ -691,6 +808,7 @@ function goHostSetup() {
     optionOrders: optionOrders
   };
   localMeta = meta;
+  hostBots = {};
 
   var metaRef = dbRef(dbPath("broto", code, "meta"));
   if (metaRef) {
@@ -797,8 +915,14 @@ function hostStartGame() {
         show("screen-host-game");
         startHostTimerTick();
         listenForAnswers();
+        scheduleBotAnswers();
         spawnParticles();
         livePodiumVisible = true;
+        if (localMeta.hideLivePodium) { livePodiumHidden = true; } else { livePodiumHidden = false; }
+        var lp = document.getElementById("live-podium");
+        var btn = document.getElementById("btn-toggle-podium");
+        if (lp) { if (livePodiumHidden) lp.classList.add("hidden"); else lp.classList.remove("hidden"); }
+        if (btn) { btn.textContent = livePodiumHidden ? "👁️ Mostrar Rank" : "🙈 Ocultar Rank"; }
         document.getElementById("live-podium").style.display = "flex";
         updateLivePodium();
       });
@@ -876,6 +1000,7 @@ function startHostTimerTick() {
 function hostReveal() {
   if (localMeta.status !== "question") return;
   clearInterval(tickTimer);
+  clearBotTimers();
   localMeta.status = "reveal";
   var metaRef = dbRef(dbPath("broto", code, "meta"));
   if (metaRef) metaRef.set(localMeta);
@@ -1012,6 +1137,19 @@ function hostReveal() {
 /* v6.0 — INTERSTITIAL HOST */
 function renderHostInterstitial() {
   sfxSlide();
+  var suspenseBox = document.getElementById("host-suspense-box");
+  var podiumBox = document.getElementById("host-interstitial-podium");
+  var streakBox = document.getElementById("host-interstitial-streak");
+  if (isSuspenseMode()) {
+    if (podiumBox) podiumBox.style.display = "none";
+    if (streakBox) streakBox.style.display = "none";
+    if (suspenseBox) suspenseBox.style.display = "block";
+    return;
+  } else {
+    if (podiumBox) podiumBox.style.display = "flex";
+    if (streakBox) streakBox.style.display = "block";
+    if (suspenseBox) suspenseBox.style.display = "none";
+  }
   var playersRef = dbRef(dbPath("broto", code, "players"));
   if (!playersRef) return;
 
@@ -1046,7 +1184,7 @@ function renderHostInterstitial() {
     // Render top 8
     var html = "";
     var maxScore = Math.max(1, items[0] ? items[0].score || 0 : 0);
-    for (var i = 0; i < Math.min(items.length, 8); i++) {
+    for (var i = 0; i < Math.min(items.length, 5); i++) {
       var p = items[i];
       var avIdx = AVATAR_DATA.findIndex(function(d) { return d.name === p.avatar; });
       var safeIdx = avIdx >= 0 ? avIdx : 0;
@@ -1087,6 +1225,12 @@ function renderHostInterstitial() {
 function hostNextFromInterstitial() {
   if (hostNextLocked) return;
   hostNextLocked = true;
+  clearBotTimers();
+  interstitialBlurred = false;
+  var screen = document.getElementById("screen-host-interstitial");
+  if (screen) screen.classList.remove("blur-mode");
+  var btn = document.getElementById("btn-toggle-blur");
+  if (btn) btn.textContent = "🙈 Ocultar Placar";
 
   var totalQs = localMeta.total || getTotalQuestions();
   if (localMeta.qIndex + 1 < totalQs) {
@@ -1100,6 +1244,7 @@ function hostNextFromInterstitial() {
         show("screen-host-game");
         startHostTimerTick();
         listenForAnswers();
+        scheduleBotAnswers();
         updateLivePodium();
         hostNextLocked = false;
       }).catch(function(err) {
@@ -1190,8 +1335,8 @@ function renderHostPodium() {
     fullList.style.display = "none";
     stage.appendChild(fullList);
 
-    podiumItems = items;
-    podiumRevealIndex = items.length - 1;
+    podiumItems =  items.slice(0, 5);
+    podiumRevealIndex = podiumItems.length - 1
 
     setTimeout(function() {
       revealCinematicPodiumStep();
@@ -1463,6 +1608,15 @@ function playerJoinRoom() {
       lastSeenStatus = "lobby";
       lastSeenQIndex = -1;
 
+      var myPlayerRef = dbRef(dbPath("broto", code, "players", myPid));
+      if (myPlayerRef) {
+        myPlayerRef.on("value", function(snap) {
+          if (!snap.exists() && lastSeenStatus !== null && lastSeenStatus !== "kicked") {
+            lastSeenStatus = "kicked";
+            show("screen-player-kicked");
+          }
+        });
+      }
       var metaRef = dbRef(dbPath("broto", code, "meta"));
       if (metaRef) {
         metaRef.on("value", function(snap) {
@@ -1477,6 +1631,7 @@ function playerJoinRoom() {
 function handlePlayerMetaChange(meta) {
   // Sempre manter localMeta atualizado com os dados mais recentes do servidor
   localMeta = meta;
+  hostBots = {};
 
   if (meta.status === "question" && (lastSeenStatus !== "question" || meta.qIndex !== lastSeenQIndex)) {
     lastSeenStatus = "question";
@@ -1765,6 +1920,28 @@ function renderPlayerReveal() {
 
 /* v6.0 — INTERSTITIAL PLAYER */
 function renderPlayerInterstitial() {
+  var suspenseBox = document.getElementById("player-suspense-box");
+  var listBox = document.getElementById("player-interstitial-list");
+  var rankBox = document.getElementById("player-interstitial-rank");
+  var scoreBox = document.getElementById("player-interstitial-score");
+  var gapBox = document.getElementById("player-interstitial-gap");
+  var streakBox = document.getElementById("player-interstitial-streak");
+  if (isSuspenseMode()) {
+    if (listBox) listBox.style.display = "none";
+    if (rankBox) rankBox.style.display = "none";
+    if (scoreBox) scoreBox.style.display = "none";
+    if (gapBox) gapBox.style.display = "none";
+    if (streakBox) streakBox.style.display = "none";
+    if (suspenseBox) suspenseBox.style.display = "block";
+    return Promise.resolve();
+  } else {
+    if (listBox) listBox.style.display = "flex";
+    if (rankBox) rankBox.style.display = "block";
+    if (scoreBox) scoreBox.style.display = "block";
+    if (gapBox) gapBox.style.display = "block";
+    if (streakBox) streakBox.style.display = "block";
+    if (suspenseBox) suspenseBox.style.display = "none";
+  }
   return dbRef(dbPath("broto", code, "players")).get().then(function(snap) {
     var items = [];
     var val = snap.val() || {};
@@ -1836,7 +2013,7 @@ function renderPlayerInterstitial() {
     // Top 8 list
     var listHtml = "";
     var maxScore = Math.max(1, items[0] ? items[0].score || 0 : 0);
-    for (var i = 0; i < Math.min(items.length, 8); i++) {
+    for (var i = 0; i < Math.min(items.length, 5); i++) {
       var p = items[i];
       var isMe = p.pid === myPid;
       var avIdx = AVATAR_DATA.findIndex(function(d) { return d.name === p.avatar; });
