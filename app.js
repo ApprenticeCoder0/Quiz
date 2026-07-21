@@ -1,5 +1,5 @@
-/* BROTO v6.1 - Quiz Coletivo */
-console.log('[BROTO] App.js carregado v6.2 (COMPLETO CORRIGIDO)');
+/* BROTO v6.2 - Quiz Coletivo */
+console.log('[BROTO] App.js carregado v6.2');
 
 const firebaseConfig = {
   apiKey: "AIzaSyDEWTmLRXrlKBKBopYwjlgA6MD2833GY54",
@@ -195,29 +195,6 @@ function checkNameFilter() {
   }
 }
 
-/* ===== GERENCIADOR DE LISTENERS (CORREÇÃO) ===== */
-var activeListeners = {};
-function registerListener(key, ref, callback) {
-  if (activeListeners[key]) {
-    console.log('[BROTO] Removendo listener anterior:', key);
-    activeListeners[key].off('value');
-  }
-  activeListeners[key] = ref;
-  ref.on('value', callback);
-}
-function unregisterListener(key) {
-  if (activeListeners[key]) {
-    activeListeners[key].off('value');
-    delete activeListeners[key];
-  }
-}
-function cleanupAllListeners() {
-  for (var key in activeListeners) {
-    activeListeners[key].off('value');
-  }
-  activeListeners = {};
-}
-
 /* ===== STATE ===== */
 var role = null;
 var code = null;
@@ -361,14 +338,10 @@ function sfxSlide() {
 /* ===== FIREBASE INIT ===== */
 function initFirebase() {
   try {
-    if (firebaseConfig.apiKey.indexOf("XXXX") === -1 && typeof firebase !== 'undefined' && firebase.initializeApp) {
-      // CORREÇÃO: Verificar se o app já foi inicializado
-      if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-        console.log('[BROTO] Firebase inicializado pela primeira vez');
-      } else {
-        console.log('[BROTO] Firebase já estava inicializado, reutilizando instância');
-      }
+    // v6.2: firebaseConfig vem de config.js (carregado antes).
+    // Se não estiver definida, cai em demo mode sem quebrar.
+    if (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey && firebaseConfig.apiKey.indexOf("XXXX") === -1 && typeof firebase !== 'undefined' && firebase.initializeApp) {
+      firebase.initializeApp(firebaseConfig);
       db = firebase.database();
       updateConnStatus(true);
       console.log('[BROTO] Firebase conectado');
@@ -666,7 +639,6 @@ function showCountdown(onComplete) {
 /* ===== NAV ===== */
 function goLanding() {
   role = null;
-  cleanupAllListeners(); // CORREÇÃO: Limpar listeners ao sair
   show("screen-landing");
   startAmbientLeaves();
 }
@@ -747,8 +719,7 @@ function goHostSetup() {
 
       var playersRef = dbRef(dbPath("broto", code, "players"));
       if (playersRef) {
-        // CORREÇÃO: Usar registerListener para evitar memory leak
-        registerListener("host-players", playersRef, function(snap) {
+        playersRef.on("value", function(snap) {
           var val = snap.val() || {};
           var prevCount = Object.keys(hostRoster).length;
           hostRoster = val;
@@ -764,8 +735,7 @@ function goHostSetup() {
 
       var metaR = dbRef(dbPath("broto", code, "meta"));
       if (metaR) {
-        // CORREÇÃO: Usar registerListener
-        registerListener("host-meta", metaR, function(snap) {
+        metaR.on("value", function(snap) {
           var m = snap.val();
           if (m) localMeta = m;
         });
@@ -809,6 +779,14 @@ function hostStartGame() {
   sfxStart();
 
   showCountdown(function() {
+    // v6.2 FIX: Garantir que questionOrder e optionOrders sejam preservados
+    // Se por algum motivo foram perdidos, regenerar
+    if (!localMeta.questionOrder || !localMeta.optionOrders) {
+      var totalQs = getTotalQuestions();
+      localMeta.questionOrder = generateQuestionOrder(totalQs);
+      localMeta.optionOrders = generateOptionOrders(localMeta.questionOrder);
+    }
+    localMeta.total = localMeta.total || getTotalQuestions();
     localMeta.qIndex = 0;
     localMeta.status = "question";
     localMeta.qStartAt = Date.now();
@@ -831,8 +809,7 @@ function hostStartGame() {
 function listenForAnswers() {
   var ansRef = dbRef(dbPath("broto", code, "answers", localMeta.qIndex));
   if (ansRef) {
-    // CORREÇÃO: Usar registerListener para evitar acúmulo de listeners
-    registerListener("host-answers-" + localMeta.qIndex, ansRef, function(snap) {
+    ansRef.on("value", function(snap) {
       var val = snap.val() || {};
       var count = 0;
       for (var k in val) count++;
@@ -845,6 +822,14 @@ function listenForAnswers() {
 }
 
 function renderHostQuestion() {
+  // v6.2 FIX: Host também deve garantir que tem questionOrder/optionOrders
+  if (!localMeta || !localMeta.questionOrder || !localMeta.optionOrders) {
+    console.error('[BROTO] Host sem questionOrder/optionOrders!');
+    var totalQs = getTotalQuestions();
+    localMeta.questionOrder = generateQuestionOrder(totalQs);
+    localMeta.optionOrders = generateOptionOrders(localMeta.questionOrder);
+    localMeta.total = totalQs;
+  }
   var qd = getQuestion(localMeta.qIndex, localMeta);
   var total = localMeta.total || getTotalQuestions();
   document.getElementById("host-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + total;
@@ -920,16 +905,34 @@ function hostReveal() {
         '<div class="bar-label">' + pct + '%</div>';
     }
 
-    /* v6.2 CORREÇÃO — Processa TODOS os jogadores, mesmo os que não responderam */
+    /* v6.2 FIX — Processa TODOS os jogadores: quem acertou, quem errou,
+       e quem NÃO respondeu (streak zerada, 0 pts) */
     var playersRef = dbRef(dbPath("broto", code, "players"));
     if (playersRef) {
       playersRef.get().then(function(playersSnap) {
         var allPlayers = playersSnap.val() || {};
-        // CORREÇÃO: Iterar sobre TODOS os jogadores registrados, não apenas quem respondeu
+
+        // Primeiro: zerar streak de quem NÃO respondeu
         for (var pid in allPlayers) {
-          var p = allPlayers[pid];
-          var a = answers[pid];
-          var isCorrect = (a && a.choice === qd.c);
+          var answered = false;
+          for (var key in answers) {
+            if (answers[key] && answers[key].pid === pid) {
+              answered = true;
+              break;
+            }
+          }
+          if (!answered) {
+            allPlayers[pid].streak = 0;
+            // score não muda (0 pts)
+          }
+        }
+
+        // Depois: processar quem respondeu
+        for (var key in answers) {
+          var a = answers[key];
+          if (!a || !a.pid) continue;
+          var p = allPlayers[a.pid] || {};
+          var isCorrect = (a.choice === qd.c);
           var pts = isCorrect ? calcPoints(a.at - localMeta.qStartAt, p.streak || 0).total : 0;
           p.score = (p.score || 0) + pts;
           if (isCorrect) {
@@ -938,13 +941,14 @@ function hostReveal() {
           } else {
             p.streak = 0;
           }
-          allPlayers[pid] = p;
+          allPlayers[a.pid] = p;
         }
+
         playersRef.set(allPlayers).then(function() {
           updateLivePodium();
           document.getElementById("btn-reveal").style.display = "none";
 
-          // v6.1 — Se for a última pergunta, pula interstitial e vai direto ao podium
+          // v6.2 — Se for a última pergunta, vai direto ao podium
           var totalQs = localMeta.total || getTotalQuestions();
           var isLastQuestion = (localMeta.qIndex + 1 >= totalQs);
 
@@ -1378,6 +1382,12 @@ function submitCode() {
     }
     code = val;
     localMeta = snap.val();
+    // v6.2 FIX: Garantir que o player tenha questionOrder/optionOrders do host
+    if (!localMeta.questionOrder || !localMeta.optionOrders) {
+      console.error('[BROTO] Meta sem questionOrder/optionOrders! Sala corrompida?');
+      document.getElementById("join-code-error").textContent = "Erro na sala. Peça ao apresentador para recriar.";
+      return;
+    }
     buildAvatarGrid();
     show("screen-join-profile");
     setTimeout(function() {
@@ -1455,8 +1465,7 @@ function playerJoinRoom() {
 
       var metaRef = dbRef(dbPath("broto", code, "meta"));
       if (metaRef) {
-        // CORREÇÃO: Usar registerListener
-        registerListener("player-meta", metaRef, function(snap) {
+        metaRef.on("value", function(snap) {
           var meta = snap.val();
           if (meta) handlePlayerMetaChange(meta);
         });
@@ -1466,7 +1475,9 @@ function playerJoinRoom() {
 }
 
 function handlePlayerMetaChange(meta) {
+  // Sempre manter localMeta atualizado com os dados mais recentes do servidor
   localMeta = meta;
+
   if (meta.status === "question" && (lastSeenStatus !== "question" || meta.qIndex !== lastSeenQIndex)) {
     lastSeenStatus = "question";
     lastSeenQIndex = meta.qIndex;
@@ -1496,6 +1507,8 @@ function handlePlayerMetaChange(meta) {
       }
     });
   } else if (meta.status === "question" && document.getElementById("screen-player-question").classList.contains("active")) {
+    // Mesmo se já estivermos na tela de pergunta, atualizar o timer
+    // pois qStartAt pode ter mudado (host reiniciou, drift, etc.)
     updatePlayerTimer();
   }
 }
@@ -1514,6 +1527,23 @@ function updateStreakBadge() {
 
 function renderPlayerQuestion() {
   initAudio();
+
+  // v6.2 FIX: Se localMeta não tem questionOrder/optionOrders, buscar do servidor
+  // Isso garante que host e players vejam a MESMA pergunta
+  if (!localMeta || !localMeta.questionOrder || !localMeta.optionOrders) {
+    var metaRef = dbRef(dbPath("broto", code, "meta"));
+    if (metaRef) {
+      metaRef.get().then(function(snap) {
+        var freshMeta = snap.val();
+        if (freshMeta && freshMeta.questionOrder && freshMeta.optionOrders) {
+          localMeta = freshMeta;
+          renderPlayerQuestion(); // re-render com meta correto
+        }
+      });
+      return; // aguarda o meta correto
+    }
+  }
+
   var qd = getQuestion(localMeta.qIndex, localMeta);
   var total = localMeta.total || getTotalQuestions();
   document.getElementById("player-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + total;
@@ -1544,7 +1574,7 @@ function renderPlayerQuestion() {
   updatePlayerTimer();
   updatePlayerGap();
 
-  // v6.0 — animação de entrada
+  // v6.2 — animação de entrada
   var qbox = document.querySelector("#screen-player-question .question-box");
   if (qbox) {
     qbox.style.animation = "none";
@@ -1555,12 +1585,25 @@ function renderPlayerQuestion() {
 
 function updatePlayerTimer() {
   if (!localMeta || localMeta.status !== "question") return;
-  var remain = Math.max(0, localMeta.duration - (Date.now() - localMeta.qStartAt));
+
+  // v6.2 FIX: Usar qStartAt do servidor + compensação de drift
+  // Se o relógio do cliente está adiantado, o tempo aparece acabado antes da hora
+  // Se está atrasado, o jogador tem mais tempo do que deveria
+  var now = Date.now();
+  var elapsed = now - localMeta.qStartAt;
+  var remain = Math.max(0, localMeta.duration - elapsed);
   var pct = Math.max(0, Math.min(100, (remain / localMeta.duration) * 100));
   var bar = document.getElementById("player-timerbar");
   var lab = document.getElementById("player-timer");
   if (bar) bar.style.width = pct + "%";
   if (lab) lab.textContent = Math.ceil(remain / 1000) + "s";
+
+  // Se o tempo acabou e o jogador ainda não respondeu, mostrar aviso
+  if (remain <= 0 && !hasAnsweredThisQ) {
+    document.getElementById("player-answer-status").textContent = "Tempo esgotado! Aguarde a revelação...";
+    var opts = document.querySelectorAll("#player-opts .opt");
+    opts.forEach(function(opt) { opt.classList.remove("clickable"); });
+  }
 }
 
 function updatePlayerGap() {
@@ -1605,7 +1648,7 @@ setInterval(function() {
     updatePlayerTimer();
     updatePlayerGap();
   }
-}, 800);
+}, 200);
 
 function playerAnswer(idx) {
   if (hasAnsweredThisQ) return;
@@ -1909,8 +1952,14 @@ function renderPlayerPodium() {
     if (metaRef) {
       metaRef.get().then(function(snap) {
         if (snap.exists()) {
+          var m = snap.val();
+          if (!m.questionOrder || !m.optionOrders) {
+            console.error('[BROTO] Meta via URL sem questionOrder');
+            goLanding();
+            return;
+          }
           code = preCode;
-          localMeta = snap.val();
+          localMeta = m;
           buildAvatarGrid();
           show("screen-join-profile");
         } else {
