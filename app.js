@@ -1,4 +1,3 @@
-/* BROTO v6.1 - Quiz Coletivo */
 console.log('[BROTO] App.js carregado v6.1');
 
 const firebaseConfig = {
@@ -180,19 +179,22 @@ function containsBadWord(name) {
 }
 
 function checkNameFilter() {
-  var input = document.getElementById("join-name-input");
-  var warning = document.getElementById("name-filter-warning");
-  var btn = document.getElementById("btn-join-room");
-  var name = input.value.trim();
-  if (name && containsBadWord(name)) {
-    warning.classList.add("show");
-    btn.disabled = true;
-    input.style.borderColor = "var(--bloom)";
-  } else {
-    warning.classList.remove("show");
-    btn.disabled = false;
-    input.style.borderColor = "";
-  }
+  clearTimeout(nameFilterTimeout);
+  nameFilterTimeout = setTimeout(function() {
+    var input = document.getElementById("join-name-input");
+    var warning = document.getElementById("name-filter-warning");
+    var btn = document.getElementById("btn-join-room");
+    var name = input.value.trim();
+    if (name && containsBadWord(name)) {
+      warning.classList.add("show");
+      btn.disabled = true;
+      input.style.borderColor = "var(--bloom)";
+    } else {
+      warning.classList.remove("show");
+      btn.disabled = false;
+      input.style.borderColor = "";
+    }
+  }, 300); // 300ms de espera após o usuário parar de digitar
 }
 
 /* ===== STATE ===== */
@@ -222,6 +224,10 @@ var hostNextLocked = false;
 var lastRoundPoints = 0;
 var lastRoundWasCorrect = false;
 var interstitialTimer = null;
+/* v6.2 FIXES */
+var currentAnsRef = null;
+var currentAnsCallback = null;
+var nameFilterTimeout = null;
 
 /* ===== AUDIO ===== */
 function initAudio() {
@@ -338,7 +344,16 @@ function sfxSlide() {
 /* ===== FIREBASE INIT ===== */
 function initFirebase() {
   try {
-    if (firebaseConfig.apiKey.indexOf("XXXX") === -1 && typeof firebase !== 'undefined' && firebase.initializeApp) {
+    // v6.2 FIX: Evita erro de reinicialização concorrente
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+      db = firebase.database();
+      updateConnStatus(true);
+      console.log('[BROTO] Firebase já inicializado, reutilizando');
+      return true;
+    }
+    // v6.2: firebaseConfig vem de config.js (carregado antes).
+    // Se não estiver definida, cai em demo mode sem quebrar.
+    if (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey && firebaseConfig.apiKey.indexOf("XXXX") === -1 && typeof firebase !== 'undefined' && firebase.initializeApp) {
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
       updateConnStatus(true);
@@ -777,6 +792,14 @@ function hostStartGame() {
   sfxStart();
 
   showCountdown(function() {
+    // v6.2 FIX: Garantir que questionOrder e optionOrders sejam preservados
+    // Se por algum motivo foram perdidos, regenerar
+    if (!localMeta.questionOrder || !localMeta.optionOrders) {
+      var totalQs = getTotalQuestions();
+      localMeta.questionOrder = generateQuestionOrder(totalQs);
+      localMeta.optionOrders = generateOptionOrders(localMeta.questionOrder);
+    }
+    localMeta.total = localMeta.total || getTotalQuestions();
     localMeta.qIndex = 0;
     localMeta.status = "question";
     localMeta.qStartAt = Date.now();
@@ -797,9 +820,17 @@ function hostStartGame() {
 }
 
 function listenForAnswers() {
+  // v6.2 FIX: Remove listener anterior antes de criar um novo
+  if (currentAnsRef && currentAnsCallback) {
+    currentAnsRef.off("value", currentAnsCallback);
+    currentAnsRef = null;
+    currentAnsCallback = null;
+  }
+
   var ansRef = dbRef(dbPath("broto", code, "answers", localMeta.qIndex));
   if (ansRef) {
-    ansRef.on("value", function(snap) {
+    currentAnsRef = ansRef;
+    currentAnsCallback = function(snap) {
       var val = snap.val() || {};
       var count = 0;
       for (var k in val) count++;
@@ -807,11 +838,20 @@ function listenForAnswers() {
       for (var k in hostRoster) total++;
       var el = document.getElementById("host-answered");
       if (el) el.textContent = count + " de " + total + " respostas";
-    });
+    };
+    ansRef.on("value", currentAnsCallback);
   }
 }
 
 function renderHostQuestion() {
+  // v6.2 FIX: Host também deve garantir que tem questionOrder/optionOrders
+  if (!localMeta || !localMeta.questionOrder || !localMeta.optionOrders) {
+    console.error('[BROTO] Host sem questionOrder/optionOrders!');
+    var totalQs = getTotalQuestions();
+    localMeta.questionOrder = generateQuestionOrder(totalQs);
+    localMeta.optionOrders = generateOptionOrders(localMeta.questionOrder);
+    localMeta.total = totalQs;
+  }
   var qd = getQuestion(localMeta.qIndex, localMeta);
   var total = localMeta.total || getTotalQuestions();
   document.getElementById("host-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + total;
@@ -887,12 +927,29 @@ function hostReveal() {
         '<div class="bar-label">' + pct + '%</div>';
     }
 
-    /* v6.1 FIX — Processa TODOS os jogadores de uma vez (batch) para evitar
-       race condition e closure bug com var no loop */
+    /* v6.2 FIX — Processa TODOS os jogadores: quem acertou, quem errou,
+       e quem NÃO respondeu (streak zerada, 0 pts) */
     var playersRef = dbRef(dbPath("broto", code, "players"));
     if (playersRef) {
       playersRef.get().then(function(playersSnap) {
         var allPlayers = playersSnap.val() || {};
+
+        // Primeiro: zerar streak de quem NÃO respondeu
+        for (var pid in allPlayers) {
+          var answered = false;
+          for (var key in answers) {
+            if (answers[key] && answers[key].pid === pid) {
+              answered = true;
+              break;
+            }
+          }
+          if (!answered) {
+            allPlayers[pid].streak = 0;
+            // score não muda (0 pts)
+          }
+        }
+
+        // Depois: processar quem respondeu
         for (var key in answers) {
           var a = answers[key];
           if (!a || !a.pid) continue;
@@ -908,11 +965,12 @@ function hostReveal() {
           }
           allPlayers[a.pid] = p;
         }
+
         playersRef.set(allPlayers).then(function() {
           updateLivePodium();
           document.getElementById("btn-reveal").style.display = "none";
 
-          // v6.1 — Se for a última pergunta, pula interstitial e vai direto ao podium
+          // v6.2 — Se for a última pergunta, vai direto ao podium
           var totalQs = localMeta.total || getTotalQuestions();
           var isLastQuestion = (localMeta.qIndex + 1 >= totalQs);
 
@@ -1346,6 +1404,12 @@ function submitCode() {
     }
     code = val;
     localMeta = snap.val();
+    // v6.2 FIX: Garantir que o player tenha questionOrder/optionOrders do host
+    if (!localMeta.questionOrder || !localMeta.optionOrders) {
+      console.error('[BROTO] Meta sem questionOrder/optionOrders! Sala corrompida?');
+      document.getElementById("join-code-error").textContent = "Erro na sala. Peça ao apresentador para recriar.";
+      return;
+    }
     buildAvatarGrid();
     show("screen-join-profile");
     setTimeout(function() {
@@ -1433,7 +1497,9 @@ function playerJoinRoom() {
 }
 
 function handlePlayerMetaChange(meta) {
+  // Sempre manter localMeta atualizado com os dados mais recentes do servidor
   localMeta = meta;
+
   if (meta.status === "question" && (lastSeenStatus !== "question" || meta.qIndex !== lastSeenQIndex)) {
     lastSeenStatus = "question";
     lastSeenQIndex = meta.qIndex;
@@ -1463,6 +1529,8 @@ function handlePlayerMetaChange(meta) {
       }
     });
   } else if (meta.status === "question" && document.getElementById("screen-player-question").classList.contains("active")) {
+    // Mesmo se já estivermos na tela de pergunta, atualizar o timer
+    // pois qStartAt pode ter mudado (host reiniciou, drift, etc.)
     updatePlayerTimer();
   }
 }
@@ -1481,6 +1549,23 @@ function updateStreakBadge() {
 
 function renderPlayerQuestion() {
   initAudio();
+
+  // v6.2 FIX: Se localMeta não tem questionOrder/optionOrders, buscar do servidor
+  // Isso garante que host e players vejam a MESMA pergunta
+  if (!localMeta || !localMeta.questionOrder || !localMeta.optionOrders) {
+    var metaRef = dbRef(dbPath("broto", code, "meta"));
+    if (metaRef) {
+      metaRef.get().then(function(snap) {
+        var freshMeta = snap.val();
+        if (freshMeta && freshMeta.questionOrder && freshMeta.optionOrders) {
+          localMeta = freshMeta;
+          renderPlayerQuestion(); // re-render com meta correto
+        }
+      });
+      return; // aguarda o meta correto
+    }
+  }
+
   var qd = getQuestion(localMeta.qIndex, localMeta);
   var total = localMeta.total || getTotalQuestions();
   document.getElementById("player-qcounter").textContent = "Pergunta " + (localMeta.qIndex + 1) + " de " + total;
@@ -1511,7 +1596,7 @@ function renderPlayerQuestion() {
   updatePlayerTimer();
   updatePlayerGap();
 
-  // v6.0 — animação de entrada
+  // v6.2 — animação de entrada
   var qbox = document.querySelector("#screen-player-question .question-box");
   if (qbox) {
     qbox.style.animation = "none";
@@ -1522,12 +1607,25 @@ function renderPlayerQuestion() {
 
 function updatePlayerTimer() {
   if (!localMeta || localMeta.status !== "question") return;
-  var remain = Math.max(0, localMeta.duration - (Date.now() - localMeta.qStartAt));
+
+  // v6.2 FIX: Usar qStartAt do servidor + compensação de drift
+  // Se o relógio do cliente está adiantado, o tempo aparece acabado antes da hora
+  // Se está atrasado, o jogador tem mais tempo do que deveria
+  var now = Date.now();
+  var elapsed = now - localMeta.qStartAt;
+  var remain = Math.max(0, localMeta.duration - elapsed);
   var pct = Math.max(0, Math.min(100, (remain / localMeta.duration) * 100));
   var bar = document.getElementById("player-timerbar");
   var lab = document.getElementById("player-timer");
   if (bar) bar.style.width = pct + "%";
   if (lab) lab.textContent = Math.ceil(remain / 1000) + "s";
+
+  // Se o tempo acabou e o jogador ainda não respondeu, mostrar aviso
+  if (remain <= 0 && !hasAnsweredThisQ) {
+    document.getElementById("player-answer-status").textContent = "Tempo esgotado! Aguarde a revelação...";
+    var opts = document.querySelectorAll("#player-opts .opt");
+    opts.forEach(function(opt) { opt.classList.remove("clickable"); });
+  }
 }
 
 function updatePlayerGap() {
@@ -1572,7 +1670,7 @@ setInterval(function() {
     updatePlayerTimer();
     updatePlayerGap();
   }
-}, 800);
+}, 200);
 
 function playerAnswer(idx) {
   if (hasAnsweredThisQ) return;
@@ -1876,8 +1974,14 @@ function renderPlayerPodium() {
     if (metaRef) {
       metaRef.get().then(function(snap) {
         if (snap.exists()) {
+          var m = snap.val();
+          if (!m.questionOrder || !m.optionOrders) {
+            console.error('[BROTO] Meta via URL sem questionOrder');
+            goLanding();
+            return;
+          }
           code = preCode;
-          localMeta = snap.val();
+          localMeta = m;
           buildAvatarGrid();
           show("screen-join-profile");
         } else {
