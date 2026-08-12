@@ -345,6 +345,36 @@ input[type="text"].name-input { font-family: inherit; font-size: 16px; letter-sp
   .spotlight-medal { font-size: 24px; }
   .podium-full-list .podium-step { padding: 12px 16px; gap: 12px; }
 }
+
+
+/* FIX ALINHAMENTO LOBBY — v6.2.1 */
+.lobby-header,
+.code-showcase,
+.qr-showcase,
+.lobby-players-area,
+.host-bot-controls,
+#screen-host-lobby .host-controls {
+  width: 100%;
+  max-width: 600px;
+}
+
+.lobby-header {
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+.code-showcase {
+  margin: 20px 0;
+}
+
+.qr-showcase {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 14px 0;
+}
+
 @media (max-width: 480px) {
   .podium-cinematic { min-height: 280px; }
   .podium-spotlight-card { padding: 20px 14px; max-width: 300px; }
