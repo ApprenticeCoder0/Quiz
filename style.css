@@ -16,8 +16,8 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { scroll-behavior: smooth; }
-html, body { min-height: 100vh; overflow-x: hidden; }
+html { scroll-behavior: smooth; height: 100%; }
+html, body { min-height: 100vh; min-height: 100dvh; overflow-x: hidden; }
 
 body {
   background: var(--paper);
@@ -26,12 +26,39 @@ body {
   line-height: 1.6;
   position: relative;
   background-image: var(--grid);
+  height: 100%;
 }
 
-.app { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+.app { 
+  position: relative; 
+  z-index: 1; 
+  min-height: 100vh; 
+  min-height: 100dvh;
+  display: flex; 
+  flex-direction: column; 
+  height: 100%;
+}
 
-.screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 28px 20px; width: 100%; opacity: 0; transform: translateY(8px); transition: opacity 0.2s ease, transform 0.2s ease; }
-.screen.active { display: flex; opacity: 1; transform: translateY(0); }
+/* FIX RESPONSIVIDADE: telas ocupam 100% da altura */
+.screen { 
+  display: none; 
+  min-height: 100vh; 
+  min-height: 100dvh;
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  padding: 28px 20px; 
+  width: 100%; 
+  opacity: 0; 
+  transform: translateY(8px); 
+  transition: opacity 0.2s ease, transform 0.2s ease; 
+  flex: 1;
+}
+.screen.active { 
+  display: flex; 
+  opacity: 1; 
+  transform: translateY(0); 
+}
 
 h1, h2, h3 { font-family: Georgia, 'Times New Roman', serif; letter-spacing: -0.03em; line-height: 1.1; font-weight: 700; }
 
@@ -345,8 +372,65 @@ input[type="text"].name-input { font-family: inherit; font-size: 16px; letter-sp
   .is-score { font-size: 15px; }
 }
 
+/* ============================================================
+   FIX RESPONSIVIDADE MOBILE — v6.2.1
+   Resolve o problema de espaço sobrando na tela
+   ============================================================ */
+
 @media (max-width: 480px) {
-  .screen { padding: 16px 14px; justify-content: flex-start; padding-top: 56px; }
+  /* Telas ocupam 100% da altura disponível */
+  .screen { 
+    padding: 16px 14px; 
+    justify-content: flex-start; 
+    padding-top: 56px; 
+    min-height: 100vh;
+    min-height: 100dvh;
+    flex: 1;
+  }
+
+  /* Landing: conteúdo centralizado verticalmente */
+  #screen-landing.screen {
+    justify-content: center;
+    padding-top: 16px;
+  }
+
+  /* Cards expandem para ocupar espaço disponível */
+  .card, .join-card, .setup-card, .player-wait-card, .reveal-card, .interstitial-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  /* Lobby: distribui conteúdo verticalmente */
+  #screen-host-lobby.screen {
+    justify-content: flex-start;
+    padding-top: 56px;
+  }
+
+  /* Game: preenche tela verticalmente */
+  #screen-host-game.screen,
+  #screen-player-question.screen {
+    justify-content: flex-start;
+    padding-top: 56px;
+  }
+
+  /* Interstitial: centraliza conteúdo */
+  #screen-host-interstitial.screen,
+  #screen-player-interstitial.screen {
+    justify-content: center;
+    padding-top: 16px;
+  }
+
+  /* Podium: centraliza */
+  #screen-host-podium.screen,
+  #screen-player-podium.screen {
+    justify-content: flex-start;
+    padding-top: 56px;
+  }
+
   .wordmark { font-size: clamp(40px, 14vw, 60px); gap: 6px; }
   .subtitle { font-size: 14px; padding: 0; }
   .stack { margin-top: 24px; gap: 10px; }
