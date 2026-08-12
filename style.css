@@ -106,17 +106,14 @@ input[type="text"]:focus, input[type="number"]:focus { border-color: var(--accen
 input[type="text"].name-input { font-family: inherit; font-size: 16px; letter-spacing: 0; text-align: left; }
 .error-text { color: var(--accent); font-size: 13px; text-align: left; margin-top: 10px; min-height: 18px; font-weight: 500; }
 
-.code-showcase { margin: 20px 0; }
 .code-plate { font-family: 'Courier New', monospace; font-weight: 700; letter-spacing: 0.2em; font-size: clamp(40px, 8vw, 64px); color: var(--ink); text-align: left; background: #fff; border: 2px solid var(--border); border-radius: 0; padding: 20px 18px; position: relative; box-shadow: 4px 4px 0 var(--border); }
 .code-label { font-family: 'Courier New', monospace; font-size: 11px; color: var(--ink-ghost); text-align: left; margin-top: 8px; letter-spacing: 0.1em; text-transform: uppercase; }
 
-.qr-showcase { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin: 14px 0; }
 .qr-wrap { background: #fff; padding: 12px; border: 2px solid var(--border); box-shadow: 4px 4px 0 var(--border); }
 .qr-url { font-family: 'Courier New', monospace; font-size: 10px; color: var(--ink-ghost); word-break: break-all; max-width: 260px; }
 
-.lobby-header { text-align: left; margin-bottom: 8px; }
 .lobby-header h2 { font-size: clamp(18px, 4vw, 24px); }
-.lobby-players-area { width: 100%; max-width: 600px; margin: 16px 0; }
+
 .lobby-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; min-height: 60px; padding: 8px; }
 .sprout { display: flex; flex-direction: column; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--border); border-radius: 0; padding: 10px 12px 8px; min-width: 72px; box-shadow: 2px 2px 0 var(--border); transition: all 0.1s ease; }
 .sprout:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--border); }
@@ -124,6 +121,62 @@ input[type="text"].name-input { font-family: inherit; font-size: 16px; letter-sp
 .sprout .nm { font-size: 11px; color: var(--ink-light); max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
 .count-pill { display: inline-flex; align-items: center; gap: 6px; font-family: 'Courier New', monospace; font-size: 12px; color: var(--ink); border: 1px solid var(--border); border-radius: 0; padding: 6px 14px; margin-top: 10px; background: #fff; }
 .count-icon { font-size: 13px; }
+
+/* ============================================================
+   LOBBY — Alinhamento Centralizado v6.2.1
+   ============================================================ */
+
+/* Regra geral: todos os elementos do lobby compartilham 
+   a mesma largura máxima e são centralizados na página */
+#screen-host-lobby.screen .lobby-header,
+#screen-host-lobby.screen .code-showcase,
+#screen-host-lobby.screen .qr-showcase,
+#screen-host-lobby.screen .lobby-players-area,
+#screen-host-lobby.screen .host-bot-controls,
+#screen-host-lobby.screen .host-controls {
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Propriedades específicas de cada elemento */
+.lobby-header {
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+.code-showcase {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.qr-showcase {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+.lobby-players-area {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.host-bot-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+#screen-host-lobby .host-controls {
+  margin-top: 24px;
+}
+
 
 .avatar-section { margin-top: 18px; }
 .avatar-label { font-size: 12px; color: var(--ink-light); font-weight: 600; margin-bottom: 10px; text-align: left; }
@@ -347,52 +400,34 @@ input[type="text"].name-input { font-family: inherit; font-size: 16px; letter-sp
 }
 
 
-/* FIX ALINHAMENTO LOBBY — v6.2.1 */
-/* Centraliza o container na tela, mantém conteúdo alinhado à esquerda */
-.lobby-header,
-.code-showcase,
-.qr-showcase,
-.lobby-players-area,
-.host-bot-controls,
-#screen-host-lobby .host-controls {
+
+
+
+
+
+
+
+
+#screen-host-lobby.screen .lobby-header,
+#screen-host-lobby.screen .code-showcase,
+#screen-host-lobby.screen .qr-showcase,
+#screen-host-lobby.screen .lobby-players-area,
+#screen-host-lobby.screen .host-bot-controls,
+#screen-host-lobby.screen .host-controls {
   width: 100%;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
 }
 
-.lobby-header {
-  text-align: left;
-  margin-bottom: 8px;
-}
+/* Propriedades específicas de cada elemento (sem sobrescrever margin) */
+#screen-host-lobby .host-controls { margin-top: 24px; }
 
-.code-showcase {
-  margin: 20px auto;
-}
 
-.qr-showcase {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  margin: 14px auto;
-}
 
-.lobby-players-area {
-  margin: 16px auto;
-}
 
-.host-bot-controls {
-  margin-bottom: 14px;
-  margin-left: auto;
-  margin-right: auto;
-}
 
-#screen-host-lobby .host-controls {
-  margin-top: 24px;
-  margin-left: auto;
-  margin-right: auto;
-}
+
 
 @media (max-width: 480px) {
   .podium-cinematic { min-height: 280px; }
@@ -454,11 +489,7 @@ input[type="text"].name-input { font-family: inherit; font-size: 16px; letter-sp
   }
 
   /* Lobby: distribui conteúdo verticalmente */
-  #screen-host-lobby.screen {
-    justify-content: flex-start;
-    padding-top: 56px;
-  }
-
+  
   /* Game: preenche tela verticalmente */
   #screen-host-game.screen,
   #screen-player-question.screen {
@@ -545,7 +576,6 @@ input[type="text"].name-input { font-family: inherit; font-size: 16px; letter-sp
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
-.host-bot-controls { display: flex; gap: 10px; justify-content: flex-start; margin-bottom: 14px; flex-wrap: wrap; }
 .host-bot-controls .btn-sm { font-size: 12px; padding: 8px 14px; border-radius: 0; }
 
 .sprout { position: relative; }
@@ -573,8 +603,7 @@ input[type="text"].name-input { font-family: inherit; font-size: 16px; letter-sp
 #screen-player-kicked h2 { color: var(--accent); }
 
 @media (max-width: 480px) {
-  .host-bot-controls { gap: 6px; }
-  .host-bot-controls .btn-sm { font-size: 11px; padding: 6px 10px; }
+    .host-bot-controls .btn-sm { font-size: 11px; padding: 6px 10px; }
   .suspense-box { padding: 28px 18px; }
   .suspense-title { font-size: 18px; }
   .suspense-icon { font-size: 32px; }
