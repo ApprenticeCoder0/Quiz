@@ -348,6 +348,7 @@ input[type="text"].name-input { font-family: inherit; font-size: 16px; letter-sp
 
 
 /* FIX ALINHAMENTO LOBBY — v6.2.1 */
+/* Centraliza o container na tela, mantém conteúdo alinhado à esquerda */
 .lobby-header,
 .code-showcase,
 .qr-showcase,
@@ -356,6 +357,8 @@ input[type="text"].name-input { font-family: inherit; font-size: 16px; letter-sp
 #screen-host-lobby .host-controls {
   width: 100%;
   max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .lobby-header {
@@ -364,7 +367,7 @@ input[type="text"].name-input { font-family: inherit; font-size: 16px; letter-sp
 }
 
 .code-showcase {
-  margin: 20px 0;
+  margin: 20px auto;
 }
 
 .qr-showcase {
@@ -372,7 +375,23 @@ input[type="text"].name-input { font-family: inherit; font-size: 16px; letter-sp
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
-  margin: 14px 0;
+  margin: 14px auto;
+}
+
+.lobby-players-area {
+  margin: 16px auto;
+}
+
+.host-bot-controls {
+  margin-bottom: 14px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#screen-host-lobby .host-controls {
+  margin-top: 24px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 @media (max-width: 480px) {
