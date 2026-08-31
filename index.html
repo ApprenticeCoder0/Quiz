@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0a1810">
-<meta name="description" content="BROTO v6.2 - Quiz Coletivo sobre Ética Ambiental e Ecofeminismo">
+<meta name="description" content="Quiz Coletivo">
 <title>Broto</title>
-<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=6.2">
+<link rel="stylesheet" href="style.css?v=6.3">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -47,7 +47,8 @@
         <div class="wordmark-underline"></div>
       </div>
 
-      <p class="subtitle">Cada resposta certa é uma raiz a mais.<br>Junte a turma e faça esse tema florescer.</p>
+      <p class="subtitle">Cada resposta certa é um conhecimento a mais.<br>Junte a turma e faça esse tema alcançar a Noosfera.</p>
+      <div class="error-text" id="landing-msg" style="min-height:16px;"></div>
 
       <div class="topic-pills">
         <span class="pill">Ética Ambiental</span>
@@ -70,7 +71,7 @@
       <div class="landing-features">
         <div class="feat" data-delay="0">
           <div class="feat-ring">⚡</div>
-          <span class="feat-text">25 perguntas</span>
+          <span class="feat-text" id="landing-qcount-text">20 perguntas</span>
         </div>
         <div class="feat" data-delay="1">
           <div class="feat-ring">🔥</div>
@@ -88,7 +89,7 @@
     </div>
 
     <div class="floating-leaves" id="floating-leaves"></div>
-    <div class="foot">BROTO v6.2 — Quiz Coletivo</div>
+    <div class="foot">Quiz Coletivo · <span class="admin-link" onclick="goAdmin()">admin</span></div>
   </div>
 
   <!-- ═════════════════ HOST: SETUP ═════════════════ -->
@@ -137,6 +138,9 @@
 <div class="host-controls">
       <button class="btn btn-primary btn-large" id="btn-start-game" onclick="hostStartGame()" disabled>
         <span>🌻</span> Iniciar Quiz
+      </button>
+      <button class="btn btn-ghost" style="margin-top:10px;" onclick="showConfirmModal('Cancelar a sala remove todos os jogadores. Tem certeza?', cancelHostLobby)">
+        ← Cancelar sala
       </button>
     </div>
   </div>
@@ -189,7 +193,7 @@
     <div class="suspense-box" id="host-suspense-box" style="display:none;">
       <div class="suspense-icon">🔒</div>
       <div class="suspense-title">Modo Suspense Ativado</div>
-      <div class="suspense-sub">A partir da pergunta 20, as posições ficam ocultas até o pódio final.</div>
+      <div class="suspense-sub" id="host-suspense-sub-text">A partir da pergunta 20, as posições ficam ocultas até o pódio final.</div>
     </div>
     <div class="host-controls">
             <button class="btn btn-ghost btn-sm" id="btn-toggle-blur" onclick="toggleInterstitialBlur()">🙈 Ocultar Placar</button>
@@ -210,7 +214,7 @@
     <div class="podium-stage" id="host-podium"></div>
     <div class="rank-list" id="host-ranklist"></div>
 
-    <button class="btn btn-ghost" onclick="location.reload()" style="margin-top:22px;">
+    <button class="btn btn-ghost" onclick="hostEndSession()" style="margin-top:22px;">
       ↻ Encerrar e voltar ao início
     </button>
   </div>
@@ -271,7 +275,7 @@
     <div class="player-wait-card">
       <div class="wait-status">
         <span class="pulse-dot"></span>
-        <span>Você está conectado!</span>
+        <span>Você está dentro!</span>
       </div>
 
       <div class="wait-avatar-wrap">
@@ -282,6 +286,9 @@
       <div class="wait-name" id="player-wait-name">-</div>
       <div class="wait-hint">Aguarde a pessoa apresentadora iniciar o quiz na tela projetada.</div>
       <div class="code-tag" id="player-wait-code">sala ------</div>
+      <button class="btn btn-ghost" style="margin-top:18px;" onclick="showConfirmModal('Quer mesmo sair da sala?', leavePlayerRoom)">
+        ← Sair da sala
+      </button>
     </div>
   </div>
 
@@ -370,6 +377,9 @@
       <div class="score-badge score-badge--large" id="player-final-score"></div>
     </div>
     <div class="rank-list" id="player-final-list"></div>
+      <button class="btn btn-secondary" id="btn-go-feedback" onclick="goToFeedback()" style="margin-top:18px; display:none;">
+        📝 Responder pesquisa rápida
+      </button>
   </div>
 
   <!-- ═════════════════ PLAYER: KICKED ═════════════════ -->
@@ -378,7 +388,97 @@
       <div style="font-size:56px;margin-bottom:14px;">👋</div>
       <h2>Você foi removido</h2>
       <p class="subtitle">O apresentador removeu você da sala.</p>
-      <button class="btn btn-secondary" onclick="location.reload()" style="margin-top:18px;">↻ Voltar ao início</button>
+      <button class="btn btn-secondary" onclick="clearPlayerSession();location.reload()" style="margin-top:18px;">↻ Voltar ao início</button>
+    </div>
+  </div>
+
+  <!-- ═════════════════ PLAYER: FEEDBACK ═════════════════ -->
+  <div class="screen" id="screen-player-feedback">
+    <div class="join-card" style="max-width:440px;">
+      <div class="eyebrow">Pesquisa Rápida</div>
+      <h2>Como foi sua experiência?</h2>
+      <p class="subtitle">3 perguntinhas bem rápidas — pode pular se quiser :)</p>
+
+      <div class="feedback-q">
+        <div class="feedback-label">1. O que achou dessa forma de ensino?</div>
+        <div class="feedback-options" id="fb-q1">
+          <label class="fb-opt"><input type="radio" name="fb-q1" value="ruim" onchange="pickFeedback('q1','ruim')">😞 Ruim</label>
+          <label class="fb-opt"><input type="radio" name="fb-q1" value="mais-ou-menos" onchange="pickFeedback('q1','mais-ou-menos')">😐 Mais ou menos</label>
+          <label class="fb-opt"><input type="radio" name="fb-q1" value="muito-bom" onchange="pickFeedback('q1','muito-bom')">😄 Muito bom</label>
+        </div>
+      </div>
+
+      <div class="feedback-q">
+        <div class="feedback-label">2. Quer mais projetos assim na escola?</div>
+        <div class="feedback-options" id="fb-q2">
+          <label class="fb-opt"><input type="radio" name="fb-q2" value="sim" onchange="pickFeedback('q2','sim')">👍 Sim</label>
+          <label class="fb-opt"><input type="radio" name="fb-q2" value="nao" onchange="pickFeedback('q2','nao')">👎 Não</label>
+          <label class="fb-opt"><input type="radio" name="fb-q2" value="talvez" onchange="pickFeedback('q2','talvez')">🤔 Talvez</label>
+        </div>
+      </div>
+
+      <div class="feedback-q">
+        <div class="feedback-label">3. Tema para o próximo BROTO? <span class="feedback-optional">(opcional)</span></div>
+        <input type="text" class="name-input" id="fb-q3" maxlength="40" placeholder="Ex: Energia Solar, Oceano, Reciclagem...">
+      </div>
+
+      <div class="feedback-actions">
+        <button class="btn btn-primary" id="btn-submit-feedback" style="width:100%; margin-top:4px;" onclick="submitFeedback()">📤 Enviar respostas</button>
+        <button class="btn btn-ghost" style="width:100%; margin-top:8px;" onclick="skipFeedback()">Pular →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════ ADMIN DASHBOARD ═════════════════ -->
+  <div class="screen" id="screen-admin">
+    <div class="join-card" style="max-width:480px;">
+      <div class="eyebrow">Área Restrita</div>
+      <h2>Dashboard de Feedbacks</h2>
+      <p class="subtitle">Análise das respostas do formulário de satisfação</p>
+
+      <div id="admin-login">
+        <div class="feedback-label" style="margin-top:16px;">Senha de acesso:</div>
+        <input type="password" class="name-input" id="admin-pass" maxlength="20" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')checkAdminPassword()">
+        <div class="error-text" id="admin-error"></div>
+        <button class="btn btn-primary" style="width:100%; margin-top:14px;" onclick="checkAdminPassword()">Entrar</button>
+        <button class="btn btn-ghost" onclick="goLanding()" style="margin-top:10px;">← voltar</button>
+      </div>
+
+      <div id="admin-dashboard" style="display:none;">
+        <div class="admin-header">
+          <div class="admin-total" id="admin-total">0 respostas</div>
+          <button class="btn btn-ghost btn-sm" onclick="adminLogout()">Sair</button>
+        </div>
+
+        <div class="admin-section">
+          <div class="admin-title">📊 Avaliação da forma de ensino</div>
+          <div class="admin-chart" id="admin-chart-q1"></div>
+        </div>
+
+        <div class="admin-section">
+          <div class="admin-title">📊 Quer mais projetos assim?</div>
+          <div class="admin-chart" id="admin-chart-q2"></div>
+        </div>
+
+        <div class="admin-section">
+          <div class="admin-title">💡 Temas sugeridos</div>
+          <div class="admin-themes" id="admin-themes"></div>
+        </div>
+
+        <div class="admin-section">
+          <div class="admin-title">📋 Respostas por sala</div>
+          <div class="admin-rooms" id="admin-rooms"></div>
+          <div class="error-text" id="csv-msg"></div>
+          <button class="btn btn-secondary" style="width:100%; margin-top:12px;" onclick="exportFeedbackCSV()">⬇️ Baixar CSV</button>
+        </div>
+
+        <div class="admin-section">
+          <div class="admin-title">🗑️ Limpeza</div>
+          <p class="subtitle" style="text-align:left;margin-bottom:8px;">Apaga salas de quiz com mais de 6 horas (não mexe nos feedbacks).</p>
+          <div class="error-text" id="cleanup-msg"></div>
+          <button class="btn btn-secondary" style="width:100%;" onclick="cleanupOldRooms()">Apagar salas antigas</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -391,7 +491,18 @@
 
 <!-- Scripts -->
 
-<script src="questions.js?v=6.2"></script>
-<script src="app.js?v=6.2"></script>
+<script src="questions.js?v=6.3"></script>
+<script src="app.js?v=6.3"></script>
+  <!-- ═════════════════ MODAL DE CONFIRMAÇÃO ═════════════════ -->
+  <div class="modal-overlay" id="confirm-modal" style="display:none;" onclick="closeConfirmModal(event)">
+    <div class="modal-card">
+      <div class="modal-text" id="confirm-modal-text">Tem certeza?</div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeConfirmModal()">Voltar</button>
+        <button class="btn btn-primary" id="confirm-modal-btn" onclick="">Sim, confirmar</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
